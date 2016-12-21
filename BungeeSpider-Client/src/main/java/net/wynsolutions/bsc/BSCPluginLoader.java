@@ -9,26 +9,20 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import net.md_5.bungee.api.ChatColor;
-import net.wynsolutions.bsc.server.BSCServer;
 
 public class BSCPluginLoader extends BSCPlugin{
 
 	private int serverPort, serverTimeout;
 	private String serverIP, serverName;
 	
-	private BSCServer BSCSERVER;
-	private static BSCPluginLoader instance;
-	
 	@Override public void onEnable() {
 		
 		this.loadVars();
-		instance = this;
 		
 		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable(){
 
 			public void run() {
-				BSCSERVER = new BSCServer(instance);
-				BSCSERVER.start();
+				sendMessage("hello", serverName);
 			}
 			
 		}, 0L, serverTimeout*20L);
@@ -38,30 +32,7 @@ public class BSCPluginLoader extends BSCPlugin{
 	}
 	
 	@Override public void onDisable() {
-		try{
-		Socket s = new Socket(serverIP, serverPort);
-		
-		PrintWriter out = new PrintWriter(s.getOutputStream(), true);
-		BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-		 
-        out.println("shutdown");
-        out.println(serverName);
-        
-        String response = in.readLine();
-        
-        if(response == null || !response.equalsIgnoreCase("shutdown")){
-       	 //Server must be unreachable
-       	 this.getLogger().warning("--------------");
-       	 this.getLogger().warning("[BSC] Did not get response from the server! Check your settings or make sure the server is running.");
-       	 this.getLogger().warning("--------------");
-        }
-        
-        s.close();
-		}catch(Exception ex){
-			 this.getLogger().warning("--------------");
-        	 this.getLogger().warning("[BSC] Did not get response from the server! Check your settings or make sure the server is running.");
-        	 this.getLogger().warning("--------------");
-		}
+		this.sendMessage("shutdown", serverName);
 		super.onDisable();
 	}
 	
@@ -85,33 +56,7 @@ public class BSCPluginLoader extends BSCPlugin{
 				if(args[0].equalsIgnoreCase("update")){
 					sender.sendMessage(ChatColor.GOLD + "Sending update ping to server.");
 					
-					try{
-						Socket s = new Socket(serverIP, serverPort);
-						
-						PrintWriter out = new PrintWriter(s.getOutputStream(), true);
-						BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-						 
-				        out.println("Fhello");
-				        out.println(serverName);
-				        
-				        String response = in.readLine();
-				        
-				        if(response == null || !response.equalsIgnoreCase("Fhello")){
-
-				       	 //Server must be unreachable
-				       	 this.getLogger().warning("--------------");
-				       	 this.getLogger().warning("[BSC] Did not get response from the server! Check your settings or make sure the server is running.");
-				       	 this.getLogger().warning("--------------");
-				        }else{
-				        	sender.sendMessage(ChatColor.GREEN + "Server was updated");
-				        }
-				        
-				        s.close();
-						}catch(Exception ex){
-							 this.getLogger().warning("--------------");
-				        	 this.getLogger().warning("[BSC] Did not get response from the server! Check your settings or make sure the server is running.");
-				        	 this.getLogger().warning("--------------");
-						}
+					this.sendMessage("Fhello", serverName);
 				}
 				
 				
@@ -124,6 +69,34 @@ public class BSCPluginLoader extends BSCPlugin{
 		}
 		
 		return super.onCommand(sender, command, label, args);
+	}
+	
+	public void sendMessage(String... str){
+		try{
+		Socket s = new Socket(serverIP, serverPort);
+		
+		PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+		BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+		 
+		for(String s1 : str){
+			out.println(s1);
+		}
+        
+        String response = in.readLine();
+        
+        if(response == null){
+       	 //Server must be unreachable
+       	 this.getLogger().warning("--------------");
+       	 this.getLogger().warning("[BSC] Did not get response from the server! Check your settings or make sure the server is running.");
+       	 this.getLogger().warning("--------------");
+        }
+        
+        s.close();
+		}catch(Exception ex){
+			 this.getLogger().warning("--------------");
+        	 this.getLogger().warning("[BSC] Did not get response from the server! Check your settings or make sure the server is running.");
+        	 this.getLogger().warning("--------------");
+		}
 	}
 	
 	public String getServerIP(){
