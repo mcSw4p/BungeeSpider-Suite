@@ -1,0 +1,24 @@
+# BungeeSpider Configuration File
+#
+# What port would you like the server to run on?
+serverPort: 25566
+# This should be slightly higher than the timeout set on all clients. Default is [30 - client] [35 - server] (in seconds)
+serverTimeout: 35
+# Would you like messages through email to be logged to the console?
+logEmail: true
+
+
+# For each action there can be a subject and a message. If you do not want a subject set it to null or none.
+# The Message will be sent to the recipients.
+
+serverUnresponsive:
+  subject: 'BungeeSpider - Server unresponsive'
+  message: 'Server <server> has become unresponsive. May require Attention.'
+  
+# This one is the message that follows the unresponsive action. When the server is back online.
+serverResponding:
+  subject: 'BungeeSpider - Server responding'
+  message: 'Server <server> is responding.'
+  
+# This is the email you want the messages sent to.
+email: example@example.com

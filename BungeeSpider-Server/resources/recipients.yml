@@ -1,0 +1,7 @@
+# Recipients Config File
+# 'group':
+#    example@example.com
+#'group2':
+#    example2@example2.com
+admin:
+  example@example.com

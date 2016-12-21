@@ -1,0 +1,6 @@
+username: example@example.com
+password: xxxxxxx
+host-name: stmp.gmail.com
+host-port: 587
+ssl: false
+tls: true
