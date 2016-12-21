@@ -1,0 +1,39 @@
+This will show you ho the Server Messaging is handled. 
+All messages need to be sent in the correct order or they will cause errors.
+
++=======+
+Messages|
++=======+
+
+Hello:
+  subcommand: server name
+  description: Sets the server to active and resets the email trigger. (normally used by BSC)
+  
+Fhello:
+  subcommand: server name
+  description: Same as the hello command.(This can be used by anything)
+  
+Shutdown:
+  subcommand: server name
+  description: Sets the server to inactive and bypasses the email trigger.
+  
+Activeload:
+  subcommand: server name
+  decription: TBA - WIP
+  
+Message:
+  subcommand: Email
+  subcommand: subject
+  subcommand: message
+  description: Sends a message to a email.
+  
+Gmessage:
+  subcommand: Recipient Group
+  subcommand: subject
+  subcommand: message
+  description: Sends a message to all recipients in the group.
+  
+AMessage:
+  subcommand: subject
+  subcommand: message
+  description: Sends a message to all recipients.
