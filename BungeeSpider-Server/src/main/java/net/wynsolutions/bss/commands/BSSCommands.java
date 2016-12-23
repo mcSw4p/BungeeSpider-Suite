@@ -5,7 +5,8 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
-import net.wynsolutions.bss.BSSPluginLoader;
+import net.wynsolutions.bss.BSSLaunch;
+import net.wynsolutions.bss.config.IpTableConfig;
 
 public class BSSCommands extends Command{
 
@@ -19,12 +20,12 @@ public class BSSCommands extends Command{
 			if(args[0].equalsIgnoreCase("list")){
 				if(sender.hasPermission("bss.server.list") || !(sender instanceof ProxiedPlayer)){
 					sender.sendMessage(new ComponentBuilder("Server List").color(ChatColor.GOLD).create());
-					for(String s : BSSPluginLoader.serverStatus.keySet()){
+					for(String s : BSSLaunch.serverStatus.keySet()){
 						
-						if(BSSPluginLoader.serverStatus.get(s))
-							sender.sendMessage(new ComponentBuilder("- " + s + " : " + ChatColor.GOLD + BSSPluginLoader.serverStatus.get(s).toString()).color(ChatColor.GREEN).create());
+						if(BSSLaunch.serverStatus.get(s))
+							sender.sendMessage(new ComponentBuilder("- " + s + " : " + ChatColor.GOLD + BSSLaunch.serverStatus.get(s).toString()).color(ChatColor.GREEN).create());
 						else
-							sender.sendMessage(new ComponentBuilder("- " + s + " : " + ChatColor.GOLD + BSSPluginLoader.serverStatus.get(s).toString()).color(ChatColor.RED).create());
+							sender.sendMessage(new ComponentBuilder("- " + s + " : " + ChatColor.GOLD + BSSLaunch.serverStatus.get(s).toString()).color(ChatColor.RED).create());
 					}
 				}else{
 					//incorrect perms
@@ -32,34 +33,45 @@ public class BSSCommands extends Command{
 				}
 			}else if(args[0].equalsIgnoreCase("ping")){
 				if(args.length >= 2){
-					int i = 0;
-					boolean flag = false;
-					for(Byte b : args[1].getBytes()){
-						if(i == 3 || i == 8){
-							if(b != '.'){
-								flag = true;
+					if(sender.hasPermission("bss.server.ping") || !(sender instanceof ProxiedPlayer)){
+						int i = 0;
+						boolean flag = false;
+						for(Byte b : args[1].getBytes()){
+							if(i == 3 || i == 8){
+								if(b != '.'){
+									flag = true;
+								}
 							}
+							
+							i++;
+							
 						}
 						
-						i++;
-						
-					}
-					
-					if(flag){
-						//Not ip
+						if(flag){
+							//Not ip - check if it is a server name
+						}else{
+							//Use ip
+						}
 					}else{
-						//Use ip
+						//incorrect perms
+						sender.sendMessage(new ComponentBuilder("You are not allowed to do that. Please contact the administrators.").color(ChatColor.RED).create());
 					}
-					
-					
+
 				}else{
 					sender.sendMessage(new ComponentBuilder("Correct usage - /bss ping [servername/ip].").color(ChatColor.RED).create());
 				}
 			}else if(args[0].equalsIgnoreCase("addip")){
 				if(args.length == 2){
-					
-					//Add args[0] to ip list
-					
+					if(sender.hasPermission("bss.server.addip") || !(sender instanceof ProxiedPlayer)){
+						//Add args[1] to ip list
+						IpTableConfig.getAllowedIps().add(args[1]);
+						IpTableConfig.saveConfig();
+						sender.sendMessage(new ComponentBuilder("Added the ip "+ ChatColor.GOLD + args[1] + ChatColor.GREEN + " to the allowed ip's list.").color(ChatColor.GREEN).create());
+					}else{
+						//incorrect perms
+						sender.sendMessage(new ComponentBuilder("You are not allowed to do that. Please contact the administrators.").color(ChatColor.RED).create());
+					}
+
 				}else{
 					sender.sendMessage(new ComponentBuilder("Correct usage - /bss addip [ip].").color(ChatColor.RED).create());
 				}
@@ -67,7 +79,7 @@ public class BSSCommands extends Command{
 		}else{
 			//Show menu of commands
 			sender.sendMessage(new ComponentBuilder("BungeeSpider-Server Commands:").color(ChatColor.GOLD).create());
-			sender.sendMessage(new ComponentBuilder("- /bss list = List all servers conneted and list statues.").color(ChatColor.GREEN).create());
+			sender.sendMessage(new ComponentBuilder("- /bss list = List all servers conneted and list statuses.").color(ChatColor.GREEN).create());
 			sender.sendMessage(new ComponentBuilder("- /bss addip [ip] = Add a trusted ip for servers.").color(ChatColor.GREEN).create());
 			sender.sendMessage(new ComponentBuilder("- /bss ping [servername/ip] = Ping a single server to see if it\'s alive.").color(ChatColor.GREEN).create());
 		}

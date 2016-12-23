@@ -6,8 +6,13 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import net.wynsolutions.bss.BSSPluginLoader;
+import net.wynsolutions.bss.BSSLaunch;
+import net.wynsolutions.bss.config.IpTableConfig;
+import net.wynsolutions.bss.config.RecipientsConfig;
+import net.wynsolutions.bss.debug.Debug;
 import net.wynsolutions.bss.email.Email;
+import net.wynsolutions.bss.server.event.EventHandler;
+import net.wynsolutions.bss.server.event.MessageRecieveEvent;
 
 public class BSServerInputHandler {
 
@@ -18,17 +23,11 @@ public class BSServerInputHandler {
 	private Socket clientSocket;
 	
 	public BSServerInputHandler(Socket par1) {
-		
+
 		this.clientSocket = par1;
 		
 		try {
-			this.out = new PrintWriter(clientSocket.getOutputStream(), true);
-			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-			
-			this.input = in.readLine();
-
-			this.handle();
-			
+			this.handle();	
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -38,37 +37,82 @@ public class BSServerInputHandler {
 	
 	private void handle() throws IOException{
 		
-		// Track the server ip addresses and if a new one is trying to access this server
-		//Prompt the user before adding to server list. Allow this "lock" to be enabled and disabled
-		// in the server properties.
+		String ip = this.clientSocket.getInetAddress().getHostAddress();
 		
+		Debug.info("Handling client " + ip + ", input command: " + this.input);
+		
+		if(IpTableConfig.getBlockedIps().contains(ip)){
+			return;
+		}
+		
+		if(!IpTableConfig.getAllowedIps().contains(ip)){
+			if(IpTableConfig.isAllowUnrecognizedClients()){
+				if(!BSServer.tempUnrecognizedIps.contains(ip)){
+					System.out.println("Client with ip " + ip + " has connected and is not in the ip table.");
+					BSServer.addUnrecognizedIp(ip);
+				}else{
+					Debug.info("Client unrecognized, ip: " + ip);
+				}
+			}else{
+				return;
+			}
+		}
+		
+		this.out = new PrintWriter(clientSocket.getOutputStream(), true);
+		in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+		this.input = in.readLine();
+		
+		// Add Event listener for addon hooks
+		
+		MessageRecieveEvent event = EventHandler.fireMessageEvent(new MessageRecieveEvent(in, ip));
+		if(event.isCanceled()){
+			this.clientSocket.close();
+			return;
+		}
+		
+		// Client was accepted, now handle the input
 		
 		if(input.equalsIgnoreCase("hello")){
 			//Keepalive message - set server to active
-			BSSPluginLoader.triggerActiveServer(in.readLine());
+			BSSLaunch.triggerActiveServer(in.readLine());
 			
-			System.out.println("Recieved hello command");
+			Debug.info("Recieved hello command");
 			
 		}else if(input.equalsIgnoreCase("Fhello")){
 			//Server Forced Keepalive message - set server to active
 			String serverName = in.readLine();
-			BSSPluginLoader.triggerActiveServer(serverName);
-			BSSPluginLoader.instance.getProxy().getLogger().info("Server " + serverName + " has sent a forced update.");
+			BSSLaunch.triggerActiveServer(serverName);
 			
-			System.out.println("Recieved fhello command");
+			Debug.info("Recieved fhello command");
 			
 		}else if(input.equalsIgnoreCase("shutdown")){
 			//Server Shutdown message - set server to inactive
-			BSSPluginLoader.triggerInactiveServer(in.readLine());
+			BSSLaunch.triggerInactiveServer(in.readLine());
 			
-			System.out.println("Recieved shutdown command");
+			Debug.info("Recieved shutdown command");
 			
 		}else if(input.equalsIgnoreCase("activeload")){
 			//Server overloaded message - set server to overloaded
-		}else if(input.equalsIgnoreCase("message")){
 			
+			Debug.info("Recieved activeload command");
+			
+		}else if(input.equalsIgnoreCase("message")){
 			String to = in.readLine(), subject = in.readLine(), msg = in.readLine();
 			new Email(subject, msg, to);
+			
+			Debug.info("Recieved message command");
+		}else if(input.equalsIgnoreCase("gmessage")){
+			String to = in.readLine(), subject = in.readLine(), msg = in.readLine();
+			for(String s : RecipientsConfig.getRecipientGroup(to)){
+				new Email(subject, msg, s);
+			}
+			Debug.info("Recieved gmessage command");
+		}else if(input.equalsIgnoreCase("amessage")){
+			String subject = in.readLine(), msg = in.readLine();
+			for(String s : RecipientsConfig.getRecipientsEmails()){
+				new Email(subject, msg, s);
+			}
+			Debug.info("Recieved amessage command");
 		}
 		
 		//Send the message back
@@ -79,6 +123,8 @@ public class BSServerInputHandler {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		// End of input handling
 		
 	}
 	

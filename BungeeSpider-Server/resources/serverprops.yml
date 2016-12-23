@@ -22,3 +22,6 @@ serverResponding:
   
 # This is the email you want the messages sent to.
 email: example@example.com
+
+# Debug to console?
+debug: false

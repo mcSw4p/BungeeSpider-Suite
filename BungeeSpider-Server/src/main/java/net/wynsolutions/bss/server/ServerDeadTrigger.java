@@ -2,7 +2,7 @@ package net.wynsolutions.bss.server;
 
 import java.util.concurrent.TimeUnit;
 
-import net.wynsolutions.bss.BSSPluginLoader;
+import net.wynsolutions.bss.BSSLaunch;
 
 public class ServerDeadTrigger {
 
@@ -13,17 +13,17 @@ public class ServerDeadTrigger {
 	public ServerDeadTrigger(String par1) {
 		this.serverName = par1;
 		
-		BSSPluginLoader.instance.getProxy().getScheduler().schedule(BSSPluginLoader.instance, new Runnable(){
+		Scheduler.scheduleTask(new Runnable(){
 
 			@Override public void run() {
 				if(!cancel){
-					BSSPluginLoader.triggerInactiveServer(serverName);
+					BSSLaunch.triggerInactiveServer(serverName);
 					new InactiveServerNotify(serverName);
 					dead = true;
 				}
 			}
 			
-		}, BSSPluginLoader.instance.getServerTimeout(), TimeUnit.SECONDS);
+		}, BSSLaunch.instance.getServerTimeout(), TimeUnit.SECONDS);
 		
 	}
 	

@@ -2,15 +2,18 @@ package net.wynsolutions.bss.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.List;
 
-import net.wynsolutions.bss.BSSPluginLoader;
+import net.wynsolutions.bss.BSSLaunch;
 
 public class BSServer extends Thread{
 
-	private static BSSPluginLoader plugin;
+	private BSSLaunch plugin;
 	private ServerSocket serverListener;
+	public static List<String> tempUnrecognizedIps = new ArrayList<String>();
 
-	public BSServer(BSSPluginLoader par1) {
+	public BSServer(BSSLaunch par1) {
 		plugin = par1;
 	}
 
@@ -19,11 +22,11 @@ public class BSServer extends Thread{
 	}
 
 	public void startConnectionsServer(){
-		plugin.getProxy().getLogger().info("Starting Server Connection server.");
-		
+
+		System.out.println("[BSS]Starting Server Connection server.");
+
 		try {
 			serverListener = new ServerSocket(plugin.getServerPort());
-
 			while(true){
 				new BSServerInputHandler(serverListener.accept());
 			}
@@ -36,7 +39,11 @@ public class BSServer extends Thread{
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}	
-		}
+		}		
+	}
+	
+	public static void addUnrecognizedIp(final String ip){
+		tempUnrecognizedIps.add(ip);
+	}
 
 }
