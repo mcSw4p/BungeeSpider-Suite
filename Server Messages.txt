@@ -1,4 +1,4 @@
-This will show you ho the Server Messaging is handled. 
+This will show you how the Server Messaging is handled. 
 All messages need to be sent in the correct order or they will cause errors.
 
 +=======+
