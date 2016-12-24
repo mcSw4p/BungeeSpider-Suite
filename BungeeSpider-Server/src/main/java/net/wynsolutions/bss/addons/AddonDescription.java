@@ -3,9 +3,6 @@ package net.wynsolutions.bss.addons;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
-
-import net.md_5.bungee.api.plugin.Plugin;
-
 /**
  * 
  * @author SpigotMc devs

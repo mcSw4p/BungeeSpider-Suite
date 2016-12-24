@@ -1,10 +1,26 @@
 package net.wynsolutions.bss.addons;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Logger;
+
+import net.wynsolutions.bss.BSSLaunch;
+import net.wynsolutions.bss.config.Configuration;
+import net.wynsolutions.bss.config.ConfigurationProvider;
+import net.wynsolutions.bss.config.YamlConfiguration;
+
 public class Addon {
 	
 	private AddonDescription description;
+	private Logger logger = Logger.getLogger(Addon.class.getName());
+	private AddonHandler handler;
 	
-	public void init(AddonDescription desc){
+	private File configFile;
+	private Configuration config;
+	
+	public void init(AddonHandler hand, AddonDescription desc){
+		this.setHandler(hand);
 		this.setDescription(desc);
 	}
 	
@@ -28,4 +44,61 @@ public class Addon {
 		this.description = description;
 	}
 
+	public Logger getLogger() {
+		return logger;
+	}
+
+    public final InputStream getResourceAsStream(String name) {
+        return getClass().getClassLoader().getResourceAsStream(name);
+    }
+    
+    public final File getDataFolder(){
+    	return new File(BSSLaunch.getDataFolder().getPath() + File.separatorChar + "addons" + File.separatorChar + description.getName());
+    }
+    
+    public void setupConfig(){
+    	if(configFile == null){
+			configFile = new File(getDataFolder(), "config.yml");
+
+	        if (!configFile.exists()) {
+	        	try {
+					configFile.createNewFile();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+	        }
+			try {
+				config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(configFile);
+				
+				ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, configFile);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+    }
+
+	public Configuration getConfig() {
+		return config;
+	}
+
+	public void setConfig(Configuration config) {
+		this.config = config;
+	}
+	
+	public void saveConfig(){
+		try {
+			ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, configFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public AddonHandler getHandler() {
+		return handler;
+	}
+
+	public void setHandler(AddonHandler handler) {
+		this.handler = handler;
+	}
+	
 }

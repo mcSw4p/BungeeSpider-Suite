@@ -64,7 +64,7 @@ public class BSServerInputHandler {
 		
 		// Add Event listener for addon hooks
 		
-		MessageRecieveEvent event = EventHandler.fireMessageEvent(new MessageRecieveEvent(in, ip));
+		MessageRecieveEvent event = EventHandler.fireMessageEvent(new MessageRecieveEvent(in, ip, clientSocket));
 		if(event.isCanceled()){
 			this.clientSocket.close();
 			return;

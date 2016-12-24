@@ -10,17 +10,17 @@ public class Debug {
 	
 	public static void info(String msg){
 		if(ServerPropertiesConfig.isDebug())
-			logger.info(msg);
+			logger.info("[DEBUG] " + msg);
 	}
 	
 	public static void warn(String msg){
 		if(ServerPropertiesConfig.isDebug())
-			logger.warning(msg);
+			logger.warning("[DEBUG] " + msg);
 	}
 	
 	public static void severe(String msg){
 		if(ServerPropertiesConfig.isDebug())
-			logger.severe(msg);
+			logger.severe("[DEBUG] " + msg);
 	}
 	
 }

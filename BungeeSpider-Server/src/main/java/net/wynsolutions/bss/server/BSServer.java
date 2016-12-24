@@ -23,7 +23,7 @@ public class BSServer extends Thread{
 
 	public void startConnectionsServer(){
 
-		System.out.println("[BSS]Starting Server Connection server.");
+		System.out.println("[BSS] Starting Server Connection server.");
 
 		try {
 			serverListener = new ServerSocket(plugin.getServerPort());
