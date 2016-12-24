@@ -3,3 +3,4 @@ server:
   port: 25566
   name: MyServer
   timeout: 30
+debug: true
