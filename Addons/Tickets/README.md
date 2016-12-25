@@ -19,25 +19,25 @@ This addon goes in the addons folder on the BungeeSpider Client. It sends inform
 it and sends it to the server to be exported. Also allows staff members to Claim, Close, Comment, and view tickets. 
 
 ## Server Messages
-*'ticket'
-**Ticket id(int)
-**Player UUID(String)
-**Created Date
-**Location
-**Message
-**Any 'Action Dates'
+* 'ticket'
+ * Ticket id(int)
+ * Player UUID(String)
+ * Created Date
+ * Location
+ * Message
+ * Any 'Action Dates'
 
-*'ticketcm' - Action Date
-**Ticket Comment
-**Ticket id(int)
+* 'ticketcm' - Action Date
+ * Ticket Comment
+ * Ticket id(int)
 
-*'ticketcl'
-**Claimed Date
-**Ticket id(int)
+* 'ticketcl' - Action Date
+ * Claimed Date
+ * Ticket id(int)
 
-*'ticketcd'
-**Closed Date
-**Ticket id(int)
+* 'ticketcd' - Aciton Date
+ * Closed Date
+ * Ticket id(int)
  
 ## Authors
 * **Sw4p** - [mcSw4p](https://github.com/mcSw4p)
