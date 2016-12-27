@@ -2,15 +2,20 @@
 - - - -
 The BungeeSpider Suite is a Minecraft network suite to send information to Network Adminsistators/Moderators.
 BungeeSpider Server(BSS) uses sockets to send information about each server back and forth to keep track for their status. BungeeSpider Client(BSC)
- is the client tat is on each server instance that connects back to BSS to relay information. You can add Addons to both BSS and BSC to build off 
-of the server/client. 
-~~~
+ is the client tat is on each server instance that connects back to BSS to relay information. You can add [Addons](https://github.com/mcSw4p/BungeeSpider-Suite/tree/master/Addons)
+ to both BSS and BSC to build off of the server/client. 
 ~~~
 _Why not use the PluginMessagingChannels that are already built into Spigot/BungeeCord?_
 ~~~
-~~~
 We have a project that uses the PluginMessagingChannels but they require that a player be on the server to send messages. That typically means
  you run into stability issues.
+~~~
+_Will this cause my servers to lag more?_
+~~~
+Both the BungeeSpider-Server and the BungeeSpider-Client are actually pretty lightweight. The Server Does nothing more than sit and wait to be told what 
+to do by the client, so as long as the clients are not stressing the server, everything is ok. The Client does a bit more though, so naturally it is a bit 
+more reasoure intensive. But it is still very lightweight, not adding much to and existing spigot server. Ofcourse like you always hear, it all depends on 
+how many plugins/addonsyou have.
 - - - -
 ## BungeeSpider Server Versions 
 
@@ -29,6 +34,10 @@ The [Spigot/CraftBukkit](https://github.com/mcSw4p/BungeeSpider-Suite/tree/maste
 
 #### BungeeSpider-Client(BungeeCord)
 This BSC plugin is not yet created but will be for connecting multiple BungeeCord Proxies with the BungeeSpider Server.
+- - - -
+## Addons
+You can look at the Addons [here](https://github.com/mcSw4p/BungeeSpider-Suite/tree/master/Addons). Some addons require that you have its client on each BungeeSpider-Client 
+server and its server on the BungeeSpider-Server.
 - - - -
 ## Server Messages
 You can take a look at all the valid Server Messages in the "[Server Messages.txt](https://github.com/mcSw4p/BungeeSpider-Suite/blob/master/Server%20Messages.txt)".
