@@ -4,18 +4,6 @@ The BungeeSpider Suite is a Minecraft network suite to send information to Netwo
 BungeeSpider Server(BSS) uses sockets to send information about each server back and forth to keep track for their status. BungeeSpider Client(BSC)
  is the client tat is on each server instance that connects back to BSS to relay information. You can add [Addons](https://github.com/mcSw4p/BungeeSpider-Suite/tree/master/Addons)
  to both BSS and BSC to build off of the server/client. 
-~~~
-Why not use the PluginMessagingChannels that are already built into Spigot/BungeeCord?
-~~~
-We have a project that uses the PluginMessagingChannels but they require that a player be on the server to send messages. That typically means
- you run into stability issues.
-~~~
-Will this cause my servers to lag more?
-~~~
-Both the BungeeSpider-Server and the BungeeSpider-Client are actually pretty lightweight. The Server Does nothing more than sit and wait to be told what 
-to do by the client, so as long as the clients are not stressing the server, everything is ok. The Client does a bit more though, so naturally it is a bit 
-more reasoure intensive. But it is still very lightweight, not adding much to and existing spigot server. Ofcourse like you always hear, it all depends on 
-how many plugins/addonsyou have.
 - - - -
 ## BungeeSpider Server Versions 
 
@@ -42,7 +30,36 @@ server and its server on the BungeeSpider-Server.
 ## Server Messages
 You can take a look at all the valid Server Messages in the "[Server Messages.txt](https://github.com/mcSw4p/BungeeSpider-Suite/blob/master/Server%20Messages.txt)".
  These allow the Server to retrieve the info the clients are sending.
-
  - - - -
+## Questions
+> Why not use the PluginMessagingChannels that are already built into Spigot/BungeeCord?
+>> We have a project that uses the PluginMessagingChannels but they require that a player be on the server to send messages. That typically means
+ you run into stability issues.
+
+##
+ 
+> Will this cause my servers to lag more?
+>> Both the BungeeSpider-Server and the BungeeSpider-Client are actually pretty lightweight. The Server does nothing more than sit and wait to be told what 
+to do by the client, so as long as the clients are not stressing the server everything is ok. The Client does a bit more though, so naturally it is a bit 
+more reasource intensive. But it is still very lightweight, not adding much to an existing spigot server. Ofcourse like you always hear, it all depends on 
+how many plugins/addons you have.
+
+##
+
+> Can I create a custom addon for my server?
+>> Yes. Both BungeeSpider-Server and BungeeSpider-Client can be added to your build path so you can build off of them. You can view the examples. You can also add Spigot or BungeeCord
+jars if you need to access those files in your addon. You just need to extend the Addon class like this:
+~~~java
+//For a BungeeSpider-Server Addon
+public class ExampleAddon extends net.wynsolutions.bss.Addon{
+~~~
+You will also need a 'spider.yml' in your project aswell. Look in the examples to find the proper formatting.
+
+##
+
+> Does the server port need to be open?
+>> Yes. The Port needs to be open for the clients to be able to connect. You can block/allow ip address in the ip_table Config to help with extra security. If you are hosting all the servers 
+on the same computer then the BungeeSpider-Server port does not need to be open. It will work just aswell.
+
 ## Authors
 * **Sw4p** - [mcSw4p](https://github.com/mcSw4p)
