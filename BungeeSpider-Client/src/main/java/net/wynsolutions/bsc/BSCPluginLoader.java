@@ -27,6 +27,8 @@ public class BSCPluginLoader extends BSCPlugin{
 		
 		this.loadVars();
 
+		new BSC(this);
+		
 		this.addonHandler = new AddonHandler(this);
 		
 		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable(){

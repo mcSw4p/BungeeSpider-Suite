@@ -51,7 +51,7 @@ public class AddonHandler {
 				Class<? extends Addon> classToLoad = (Class<? extends Addon>) Class.forName (description.getMain(), true, child);
 				Addon instance = (Addon)classToLoad.newInstance();	
 				instance.onDisable();
-				System.out.println("Disabled addon " + description.getName() + ".");
+				System.out.println("[BSS] Disabled addon " + description.getName() + ".");
 				addons.remove(instance);
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
@@ -81,7 +81,7 @@ public class AddonHandler {
 				instance.onLoad();
 				System.out.println("[BSC] Starting addon \"" + description.getName() + "\".");
 				instance.onEnable();
-				System.out.println("[BSC] Enabled addon " + description.getName() + "\" v" + description.getVersion() + " by " + description.getAuthor() + ".");
+				System.out.println("[BSC] Enabled addon \"" + description.getName() + "\" v" + description.getVersion() + " by " + description.getAuthor() + ".");
 				if(description.getDescription() != null && !description.getDescription().equals("")){
 					System.out.println("[BSC] " + description.getName() + ": " + description.getDescription());
 				}
@@ -157,6 +157,15 @@ public class AddonHandler {
 
 		return aDesc;
 	}
+	
+	public Addon getAddon(String name){
+		for(Addon a : this.addons){
+			if(a.getDescription().getName().equalsIgnoreCase(name)){
+				return a;
+			}
+		}
+		return null;
+	}
 
 	public void registerCommand(String name, final Command executor){
 		Field bukkitCommandMap;
@@ -176,6 +185,14 @@ public class AddonHandler {
  
 	public Player getPlayerByName(String name){
 		return Bukkit.getPlayer(name);
+	}
+	
+	public String getServerIp(){
+		return plugin.getServerIP();
+	}
+	
+	public int getServerPort(){
+		return plugin.getServerPort();
 	}
 	
 }
