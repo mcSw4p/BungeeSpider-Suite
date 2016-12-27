@@ -5,12 +5,12 @@ BungeeSpider Server(BSS) uses sockets to send information about each server back
  is the client tat is on each server instance that connects back to BSS to relay information. You can add [Addons](https://github.com/mcSw4p/BungeeSpider-Suite/tree/master/Addons)
  to both BSS and BSC to build off of the server/client. 
 ~~~
-_Why not use the PluginMessagingChannels that are already built into Spigot/BungeeCord?_
+Why not use the PluginMessagingChannels that are already built into Spigot/BungeeCord?
 ~~~
 We have a project that uses the PluginMessagingChannels but they require that a player be on the server to send messages. That typically means
  you run into stability issues.
 ~~~
-_Will this cause my servers to lag more?_
+Will this cause my servers to lag more?
 ~~~
 Both the BungeeSpider-Server and the BungeeSpider-Client are actually pretty lightweight. The Server Does nothing more than sit and wait to be told what 
 to do by the client, so as long as the clients are not stressing the server, everything is ok. The Client does a bit more though, so naturally it is a bit 
