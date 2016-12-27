@@ -1,0 +1,4 @@
+name: BungeeSpider-EventNotifier(Client)
+main: net.wynsolutions.bsen.BSENAddon
+version: 0.0.1
+author: Sw4p

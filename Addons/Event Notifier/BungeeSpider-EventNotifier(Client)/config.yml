@@ -1,0 +1,41 @@
+tps:
+  enabled: true
+  update-interval: 60
+  threshold: 12.0
+  to:
+    group: true
+    to: 'admin'
+  msg:
+    subject: none
+    message: 'Server <server> has a low tps.'
+memory:
+  enabled: true
+  update-interval: 60
+  threshold: 20.0
+  to:
+    group: true
+    to: 'admin'
+  msg:
+    subject: none
+    message: 'Server <server> is low on memory.'
+playercount:
+  enabled: true
+  update-interval: 60
+  threshold: 1
+  to:
+    group: true
+    to: 'admin'
+  msg:
+    subject: none
+    message: 'Server <server> is low on open player slots.'
+diskusage:
+  enabled: true
+  update-interval: 60
+  threshold: 5
+  to:
+    group: true
+    to: 'admin'
+  msg:
+    subject: none
+    message: 'Server <server> is low on disk space.'
+debug: false
