@@ -2,6 +2,7 @@ package net.wynsolutions.bsen;
 
 import net.wynsolutions.bsc.BSC;
 import net.wynsolutions.bsc.addons.Addon;
+import net.wynsolutions.bsen.commands.BSENCommand;
 import net.wynsolutions.bsen.events.MonitorDiskUsage;
 import net.wynsolutions.bsen.events.MonitorMemory;
 import net.wynsolutions.bsen.events.MonitorPlayerCount;
@@ -10,7 +11,25 @@ import net.wynsolutions.bsen.events.tasks.DiskUsageTask;
 import net.wynsolutions.bsen.events.tasks.MemoryTask;
 import net.wynsolutions.bsen.events.tasks.PlayerCountTask;
 import net.wynsolutions.bsen.events.tasks.TPSTask;
-
+/**
+ * Copyright (C) 2017  Sw4p
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * @author Sw4p
+ *
+ */
 public class BSENAddon extends Addon{
 
 	/*
@@ -19,11 +38,13 @@ public class BSENAddon extends Addon{
 	 * Having problems getting a class to do what you want? Write one that does.
 	 */
 	
+	// Monitors
 	private MonitorTPS tpsMonitor;
 	private MonitorMemory memoryMonitor;
 	private MonitorPlayerCount playerCountMonitor;
 	private MonitorDiskUsage diskUsageMonitor;
 	
+	// Debug?
 	private static boolean debug;
 	
 	// Settings
@@ -31,92 +52,95 @@ public class BSENAddon extends Addon{
 	private boolean tpsEnabled, memEnabled, playerCountEnabled, diskUsageEnabled;
 	private double tpsThreshold, memThreshold;
 	
-	//Recipients
+	// Recipients
 	private boolean tpsGroup, memGroup, playerCountGroup, diskUsageGroup;
 	private String tpsTo, memTo, playerCountTo, diskUsageTo;
 	
-	//Message Settings
+	// Message Settings
 	private String tpsSubject, tpsMessage, memSubject, memMessage, playerCountSubject, playerCountMessage, diskUsageSubject, diskUsageMessage;
 	
 	@Override public void onEnable() {
 		
-		getLogger().info("[BSEN] Enabling BungeeSpider-EventNotifier");
+		getLogger().info("[BSEN] Enabling BungeeSpider-EventNotifier"); // Notify Console that BSEN is enabling
 		
-		this.createConfig();
-		this.initMonitors();
+		this.createConfig(); // Create /Load Configuration
+		this.initMonitors(); // Initialize Monitors
 		
-		super.onEnable();
+		this.getHandler().registerCommand("bsen", new BSENCommand(this)); // Register BSEN Command
+		
+		super.onEnable(); // Call parent method
 	}
 	
 	@Override public void onDisable() {
 		
-		getLogger().info("[BSEN] Disabling BungeeSpider-EventNotifier");
+		getLogger().info("[BSEN] Disabling BungeeSpider-EventNotifier"); // Notify Console that BSEN is disabling
 		
-		BSC.cancelAllTaskForAddon(this);
-		super.onDisable();
+		BSC.cancelAllTaskForAddon(this); // WIP | Cancel all the active tasks for this addon
+		
+		super.onDisable(); // Call parent method
 	}
 	
 	private void createConfig(){
-		this.setupConfig(this.getResourceAsStream("config.yml"));
-		this.tpsInterval = (this.getConfig().getInt("tps.update-interval") * 20);
-		this.memInterval = (this.getConfig().getInt("memory.update-interval") * 20);
-		this.playerCountInterval = (this.getConfig().getInt("playercount.update-interval") * 20);
-		this.diskUsageInterval = (this.getConfig().getInt("diskusage.update-interval") * 20);
+		this.setupConfig(this.getResourceAsStream("config.yml")); // Setup Configuration Files
+		this.tpsInterval = (this.getConfig().getInt("tps.update-interval") * 20); // Load TPS Interval
+		this.memInterval = (this.getConfig().getInt("memory.update-interval") * 20); // Load Memory Interval
+		this.playerCountInterval = (this.getConfig().getInt("playercount.update-interval") * 20); // Load Player count Interval
+		this.diskUsageInterval = (this.getConfig().getInt("diskusage.update-interval") * 20); // Load Disk usage Interval
 		
-		this.tpsEnabled = this.getConfig().getBoolean("tps.enabled");
-		this.memEnabled = this.getConfig().getBoolean("memory.enabled");
-		this.playerCountEnabled = this.getConfig().getBoolean("playercount.enabled");
-		this.diskUsageEnabled = this.getConfig().getBoolean("diskusage.enabled");
+		this.tpsEnabled = this.getConfig().getBoolean("tps.enabled"); // Load TPS Enabled
+		this.memEnabled = this.getConfig().getBoolean("memory.enabled"); // Load Memory Enabled
+		this.playerCountEnabled = this.getConfig().getBoolean("playercount.enabled"); // Load Player count Enabled
+		this.diskUsageEnabled = this.getConfig().getBoolean("diskusage.enabled"); // Load Disk usage Enabled
 		
-		this.tpsThreshold = this.getConfig().getDouble("tps.threshold");
-		this.memThreshold = this.getConfig().getDouble("memory.threshold");
-		this.playerCountThreshold = this.getConfig().getInt("playercount.threshold");
-		this.diskUsageThreshold = this.getConfig().getInt("diskusage.threshold");
+		this.tpsThreshold = this.getConfig().getDouble("tps.threshold"); // Load TPS Threshold
+		this.memThreshold = this.getConfig().getDouble("memory.threshold"); // Load Memory Threshold
+		this.playerCountThreshold = this.getConfig().getInt("playercount.threshold"); // Load Player count Threshold
+		this.diskUsageThreshold = this.getConfig().getInt("diskusage.threshold"); // Load Disk usage Threshold
 		
-		this.tpsGroup = this.getConfig().getBoolean("tps.to.group");
-		this.memGroup = this.getConfig().getBoolean("memory.to.group");
-		this.playerCountGroup = this.getConfig().getBoolean("playercount.to.group");
-		this.diskUsageGroup = this.getConfig().getBoolean("diskusage.to.group");
+		this.tpsGroup = this.getConfig().getBoolean("tps.to.group"); // Load TPS Group Enabled
+		this.memGroup = this.getConfig().getBoolean("memory.to.group"); // Load Memory Group Enabled
+		this.playerCountGroup = this.getConfig().getBoolean("playercount.to.group"); // Load Player count Group Enabled
+		this.diskUsageGroup = this.getConfig().getBoolean("diskusage.to.group"); // Load Disk usage Group Enabled
 		
-		this.tpsTo = this.getConfig().getString("tps.to.to");
-		this.memTo = this.getConfig().getString("memory.to.to");
-		this.playerCountTo = this.getConfig().getString("playercount.to.to");
-		this.diskUsageTo = this.getConfig().getString("diskusage.to.to");
+		this.tpsTo = this.getConfig().getString("tps.to.to"); // Load TPS To address
+		this.memTo = this.getConfig().getString("memory.to.to"); // Load Memory To address
+		this.playerCountTo = this.getConfig().getString("playercount.to.to"); // Load Player count To address
+		this.diskUsageTo = this.getConfig().getString("diskusage.to.to"); // Load Disk usage To address
 		
-		this.tpsSubject = this.getConfig().getString("tps.msg.subject");
-		this.memSubject = this.getConfig().getString("memory.msg.subject");
-		this.playerCountSubject = this.getConfig().getString("playercount.msg.subject");
-		this.diskUsageSubject = this.getConfig().getString("diskusage.msg.subject");
+		this.tpsSubject = this.getConfig().getString("tps.msg.subject"); // Load TPS Message subject
+		this.memSubject = this.getConfig().getString("memory.msg.subject"); // Load Memory Message Subject
+		this.playerCountSubject = this.getConfig().getString("playercount.msg.subject"); // Load Player count Message subject
+		this.diskUsageSubject = this.getConfig().getString("diskusage.msg.subject"); // Load Disk usage Message subject
 		
-		this.tpsMessage = this.getConfig().getString("tps.msg.message");
-		this.memMessage = this.getConfig().getString("memory.msg.message");
-		this.playerCountMessage = this.getConfig().getString("playercount.msg.message");
-		this.diskUsageMessage = this.getConfig().getString("diskusage.msg.message");
+		this.tpsMessage = this.getConfig().getString("tps.msg.message"); // Load TPS Message
+		this.memMessage = this.getConfig().getString("memory.msg.message"); // Load Memory Message
+		this.playerCountMessage = this.getConfig().getString("playercount.msg.message"); // Load Memory Message
+		this.diskUsageMessage = this.getConfig().getString("diskusage.msg.message"); // Load Disk usage Message
 		
-		debug = this.getConfig().getBoolean("debug");
+		debug = this.getConfig().getBoolean("debug"); // Load Debug Enabled
 	}
 
 	private void initMonitors(){
-		if(this.tpsEnabled)
-			this.tpsMonitor = new MonitorTPS(this);
-		if(this.memEnabled)
-			this.memoryMonitor = new MonitorMemory();
-		if(this.playerCountEnabled)
-			this.playerCountMonitor = new MonitorPlayerCount();
-		if(this.diskUsageEnabled)
-			this.diskUsageMonitor = new MonitorDiskUsage();
-		this.loadTasks();
+		if(this.tpsEnabled) // Is TPS Enabled?
+			this.tpsMonitor = new MonitorTPS(this); // Initialize TPS Monitor
+		if(this.memEnabled) // Is Memory Enabled?
+			this.memoryMonitor = new MonitorMemory(); // Initialize Memory Monitor
+		if(this.playerCountEnabled) // Is Player count Enabled?
+			this.playerCountMonitor = new MonitorPlayerCount(); // Initialize Player count Monitor
+		if(this.diskUsageEnabled) // Is Disk usage Enabled?
+			this.diskUsageMonitor = new MonitorDiskUsage(); // Initialize Disk usage Monitor.
+		this.loadTasks(); // Load all tasks for checks
 	}
 	
 	private void loadTasks(){
-		if(this.tpsEnabled)
-			BSC.scheduleSyncRepeatingTask(this, new TPSTask(this), 2, this.tpsInterval);
-		if(this.memEnabled)
-			BSC.scheduleSyncRepeatingTask(this, new MemoryTask(this), 2, this.memInterval);
-		if(this.playerCountEnabled)
-			BSC.scheduleSyncRepeatingTask(this, new PlayerCountTask(this), 2, this.playerCountInterval);
-		if(this.diskUsageEnabled)
-			BSC.scheduleSyncRepeatingTask(this, new DiskUsageTask(this), 2, this.diskUsageInterval);
+		if(this.tpsEnabled) // Is TPS Enabled?
+			BSC.scheduleSyncRepeatingTask(this, new TPSTask(this), 2, this.tpsInterval); // Schedule repeating task for TPS Checks
+		if(this.memEnabled) // Is Memory EnableD?
+			BSC.scheduleSyncRepeatingTask(this, new MemoryTask(this), 2, this.memInterval); // Schedule repeating task for Memory Checks
+		if(this.playerCountEnabled) // Is Player count Enabled?
+			BSC.scheduleSyncRepeatingTask(this, new PlayerCountTask(this), 2, this.playerCountInterval); // Schedule repeating task for Player count Checks
+		if(this.diskUsageEnabled) // Is Disk usage Enabled?
+			BSC.scheduleSyncRepeatingTask(this, new DiskUsageTask(this), 2, this.diskUsageInterval); // Schedule repeating task for Disk usage Checks
 	}
 
 	/**

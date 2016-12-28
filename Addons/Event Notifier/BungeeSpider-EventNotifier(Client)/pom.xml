@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>BungeeSpider-EventNotifier</groupId>
   <artifactId>BungeeSpider-EventNotifier</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
   <name>BungeeSpider-EventNotifier(Client)</name>
   <description>Track events on BS servers and relay them to emails.</description>
   
