@@ -43,11 +43,16 @@ public class BSENCommand extends Command{
 				if(arg3[0].equalsIgnoreCase("memory") || arg3[0].equalsIgnoreCase("ram") || arg3[0].equalsIgnoreCase("mem")
 						|| arg3[0].equalsIgnoreCase("r") || arg3[0].equalsIgnoreCase("m")){ // Does Argument 1 equal a RAM alias?
 					
+					if(!add.isMemEnabled()){ // Is Memory enabled?
+						arg0.sendMessage(ChatColor.RED + "This is not enabled on this server."); // Send Not enabled message
+						return false; // Return method
+					}
+					
 					if(arg0.hasPermission("bsen.check.ram")){ // Does the sender have the correct permissions?
 						
 						if(arg3.length == 1){ // Is the Argument length equal to 1?
 							String ramUsage = ChatColor.AQUA + "" + this.add.getMemoryMonitor().getMemFreePercent() + ""; // Load Free RAM usage
-							if(this.add.getMemoryMonitor().getMemFreePercent() >= this.add.getMemThreshold()) // Is free ram over Threshold?
+							if(this.add.getMemoryMonitor().getMemFreePercent() <= this.add.getMemThreshold()) // Is free ram over Threshold?
 								ramUsage = ChatColor.RED + "" + this.add.getMemoryMonitor().getMemFreePercent() + ""; // Set Free RAM usage to Color RED
 							arg0.sendMessage(ChatColor.GREEN + "Current RAM usage is " + ramUsage + ChatColor.GREEN + " free."); // Send message for Free RAM
 							return true; // Return method
@@ -56,7 +61,7 @@ public class BSENCommand extends Command{
 							arg0.sendMessage(ChatColor.GREEN + "Current RAM usage/settings:"); // Send Command Title message
 							
 							String ramUsage = ChatColor.AQUA + "" + this.add.getMemoryMonitor().getMemFreePercent() + ""; // Load Free RAM usage
-							if(this.add.getMemoryMonitor().getMemFreePercent() >= this.add.getMemThreshold()) // Is free ram over theshold?
+							if(this.add.getMemoryMonitor().getMemFreePercent() <= this.add.getMemThreshold()) // Is free ram over theshold?
 								ramUsage = ChatColor.RED + "" + this.add.getMemoryMonitor().getMemFreePercent() + ""; // Set Free RAM usage to Color RED
 							arg0.sendMessage(ChatColor.GREEN + "Current RAM usage is " + ramUsage + ChatColor.GREEN + " free."); // Send message for Free RAM
 							arg0.sendMessage(ChatColor.GREEN + "Maximum RAM is " + ChatColor.AQUA + this.add.getMemoryMonitor().getMemMax() + ChatColor.GREEN + "."); // Send message for Max RAM
@@ -79,10 +84,15 @@ public class BSENCommand extends Command{
 					
 				}else if(arg3[0].equalsIgnoreCase("playercount") || arg3[0].equalsIgnoreCase("pc") || arg3[0].equalsIgnoreCase("p")){ // Does Argument 1 equal a Player count alias?
 					
+					if(!add.isPlayerCountEnabled()){ // Is Player count enabled?
+						arg0.sendMessage(ChatColor.RED + "This is not enabled on this server."); // Send Not enabled message
+						return false; // Return method
+					}
+					
 					if(arg0.hasPermission("bsen.check.pc")){ // Does the sender have the correct permissions?
 						if(arg3.length == 1){ // Is the Argument length equal to 1?
 							String playerCount = ChatColor.AQUA + "" + this.add.getPlayerCountMonitor().getCurrentPlayerCount() + ""; // Load Player count 
-							if(this.add.getPlayerCountMonitor().getCurrentPlayerCount() <= this.add.getPlayerCountThreshold()) // Is Player count over the Threshold?
+							if(this.add.getPlayerCountMonitor().getCurrentPlayerCount() >= this.add.getPlayerCountThreshold()) // Is Player count over the Threshold?
 								playerCount = ChatColor.RED + "" + this.add.getPlayerCountMonitor().getCurrentPlayerCount() + ""; // Set Player count to RED
 							arg0.sendMessage(ChatColor.GREEN + "Current player count is " + playerCount + ChatColor.GREEN + "."); // Send message for Player count
 							return true; // Return method
@@ -91,7 +101,7 @@ public class BSENCommand extends Command{
 							arg0.sendMessage(ChatColor.GREEN + "Current player count/ settings:"); // Send Command Title message
 							
 							String playerCount = ChatColor.AQUA + "" + this.add.getPlayerCountMonitor().getCurrentPlayerCount() + ""; // Load Player count 
-							if(this.add.getPlayerCountMonitor().getCurrentPlayerCount() <= this.add.getPlayerCountThreshold()) // Is Player count over the threshold?
+							if(this.add.getPlayerCountMonitor().getCurrentPlayerCount() >= this.add.getPlayerCountThreshold()) // Is Player count over the threshold?
 								playerCount = ChatColor.RED + "" + this.add.getPlayerCountMonitor().getCurrentPlayerCount() + ""; // Set Player count to RED
 							arg0.sendMessage(ChatColor.GREEN + "Current player count is " + playerCount + ChatColor.GREEN + "."); // Send message for Player count
 							arg0.sendMessage(ChatColor.GREEN + "Maximum player count is " + ChatColor.AQUA + BSC.getMaxPlayers() + ChatColor.GREEN + "."); // Send message for Max Player count
@@ -112,6 +122,11 @@ public class BSENCommand extends Command{
 					}
 					
 				}else if(arg3[0].equalsIgnoreCase("diskusage") || arg3[0].equalsIgnoreCase("disk") || arg3[0].equalsIgnoreCase("d")){ // Does Argument 1 equal a Disk usage alias?
+					
+					if(!add.isDiskUsageEnabled()){ // Is Disk usage enabled?
+						arg0.sendMessage(ChatColor.RED + "This is not enabled on this server."); // Send Not enabled message
+						return false; // Return method
+					}
 					
 					if(arg0.hasPermission("bsen.check.disk")){ // Does the Sender have the correct permissions?
 						if(arg3.length == 1){ // Is the Argument length equal to 1?
@@ -147,6 +162,11 @@ public class BSENCommand extends Command{
 					
 				}else if(arg3[0].equalsIgnoreCase("tps") || arg3[0].equalsIgnoreCase("t")){ // Does Argument 1 equal a TPS alias? 
 					
+					if(!add.isTpsEnabled()){ // Is TPS enabled?
+						arg0.sendMessage(ChatColor.RED + "This is not enabled on this server."); // Send Not enabled message
+						return false; // Return method
+					}
+					
 					if(arg0.hasPermission("bsen.check.tps")){ // Does the Sender have the correct permissions?
 						if(arg3.length == 1){ // Is the Argument length equal 1?
 							
@@ -156,7 +176,7 @@ public class BSENCommand extends Command{
 							arg0.sendMessage(ChatColor.GREEN + "Current TPS is " + tps + ChatColor.GREEN + "."); // Send message for TPS
 							return true; // Return method
 						}else{
-							arg0.sendMessage(ChatColor.RED + "Incorrect usage. Usage: /bsen t <all/a>"); // Send Incorrect Usage message
+							arg0.sendMessage(ChatColor.RED + "Incorrect usage. Usage: /bsen t"); // Send Incorrect Usage message
 							return false; // Return method
 						}	
 					}else{
@@ -164,38 +184,49 @@ public class BSENCommand extends Command{
 						return false; // Return method
 					}
 					
+				}else{
+					this.sendMenu(arg0); // Show menu
+					return false; // Return method
 				}
 				
 			}else{
 				//Show Menu
-				
-				if(arg0.hasPermission("bsen.check.menu")){ // Does the sender have the correct permission?
-					arg0.sendMessage(ChatColor.GREEN + "Event Notifier Commands:"); // Send Command Title message
-					if(arg0.hasPermission("bsen.check.ram")){ // Does the sender have the correct permission?
-						arg0.sendMessage(ChatColor.AQUA + "[+]" + ChatColor.GOLD + "/bsen [memory/ram/mem/r/m] <all/a>" + ChatColor.AQUA +  " - " + ChatColor.BLUE + 
-								"Displays the current RAM usage."); // Send Ram usage command message
-					}
-					if(arg0.hasPermission("bsen.check.pc")){ // Does the sender have the correct permission?
-						arg0.sendMessage(ChatColor.AQUA + "[+]" + ChatColor.GOLD + "/bsen [playercount/pc/p] <all/a>" + ChatColor.AQUA +  " - " + ChatColor.BLUE + 
-								"Displays the current player count."); // Send Player count command message
-					}
-					if(arg0.hasPermission("bsen.check.disk")){ // Does the sender have the correct permission?
-						arg0.sendMessage(ChatColor.AQUA + "[+]" + ChatColor.GOLD + "/bsen [diskusage/disk/d] <all/a>" + ChatColor.AQUA +  " - " + ChatColor.BLUE + 
-								"Displays the current Disk usage."); // Send Disk usage command message
-					}
-					if(arg0.hasPermission("bsen.check.tps")){ // Does the sender have the correct permission?
-						arg0.sendMessage(ChatColor.AQUA + "[+]" + ChatColor.GOLD + "/bsen [tps/t]" + ChatColor.AQUA +  " - " + ChatColor.BLUE + 
-								"Displays the current TPS."); // Send TPS command message
-					}
-					return true; // Return method
-				}else{
-					arg0.sendMessage(ChatColor.RED + "You are not allowed to do that!"); // Send Incorrect Permissions message
-					return false; // Return method
-				}
+				this.sendMenu(arg0); // Show menu
+				return true; // Return method
 			}
 		}
 		
 		return false; // Return method
+	}
+	
+	/**
+	 * Shows the BSEN menu to @param
+	 * @param arg0
+	 */
+	private void sendMenu(CommandSender arg0){
+		if(arg0.hasPermission("bsen.check.menu")){ // Does the sender have the correct permission?
+			arg0.sendMessage(ChatColor.GREEN + "Event Notifier Commands:"); // Send Command Title message
+			if(arg0.hasPermission("bsen.check.ram") && add.isMemEnabled()){ // Does the sender have the correct permission and Ram enabled?
+				arg0.sendMessage(ChatColor.AQUA + "[+]" + ChatColor.GOLD + "/bsen [memory/ram/mem/r/m] <all/a>" + ChatColor.AQUA +  " - " + ChatColor.GREEN + 
+						"Displays the current RAM usage."); // Send Ram usage command message
+			}
+			if(arg0.hasPermission("bsen.check.pc") && add.isPlayerCountEnabled()){ // Does the sender have the correct permission and Player count enabled?
+				arg0.sendMessage(ChatColor.AQUA + "[+]" + ChatColor.GOLD + "/bsen [playercount/pc/p] <all/a>" + ChatColor.AQUA +  " - " + ChatColor.GREEN + 
+						"Displays the current player count."); // Send Player count command message
+			}
+			if(arg0.hasPermission("bsen.check.disk") && add.isDiskUsageEnabled()){ // Does the sender have the correct permission and Disk usage enabled?
+				arg0.sendMessage(ChatColor.AQUA + "[+]" + ChatColor.GOLD + "/bsen [diskusage/disk/d] <all/a>" + ChatColor.AQUA +  " - " + ChatColor.GREEN + 
+						"Displays the current Disk usage."); // Send Disk usage command message
+			}
+			if(arg0.hasPermission("bsen.check.tps") && add.isTpsEnabled()){ // Does the sender have the correct permission and TPS enabled?
+				arg0.sendMessage(ChatColor.AQUA + "[+]" + ChatColor.GOLD + "/bsen [tps/t]" + ChatColor.AQUA +  " - " + ChatColor.GREEN + 
+						"Displays the current TPS."); // Send TPS command message
+			}
+			return; // Return method
+		}else{
+			arg0.sendMessage(ChatColor.RED + "You are not allowed to do that!"); // Send Incorrect Permissions message
+			return; // Return method
+		}
 	}
 
 }

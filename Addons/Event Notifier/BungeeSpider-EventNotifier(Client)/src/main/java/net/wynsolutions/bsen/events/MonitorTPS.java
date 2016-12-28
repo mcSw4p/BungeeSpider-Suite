@@ -51,10 +51,10 @@ public class MonitorTPS {
 	 * Update TPS statistics.
 	 */
 	public void updateTPS(){
-		if(this.pastTPS.size() >= this.tpsRecordLength){
-			this.pastTPS.remove(this.tpsRecordLength-1);
+		if(this.pastTPS.size() >= this.tpsRecordLength){ // Is TPS history length longer than tpsLength?
+			this.pastTPS.remove(this.tpsRecordLength-1); // Remove TPS value from end
 		}
-		this.pastTPS.add(this.getTPS());
+		this.pastTPS.add(this.getTPS()); // Add TPS to TPS history 
 	}
 	
 	/**
