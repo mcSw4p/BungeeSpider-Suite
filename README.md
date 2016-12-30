@@ -1,8 +1,9 @@
-# BungeeSpider-Suite
+![BungeeSpider Logo](http://i.imgur.com/2XAi9zC.png)
 - - - -
+# BungeeSpider-Suite 
 The BungeeSpider Suite is a Minecraft network suite to send information to Network Adminsistators/Moderators.
 BungeeSpider Server(BSS) uses sockets to send information about each server back and forth to keep track for their status. BungeeSpider Client(BSC)
- is the client tat is on each server instance that connects back to BSS to relay information. You can add [Addons](https://github.com/mcSw4p/BungeeSpider-Suite/tree/master/Addons)
+ is the client that is on each server instance that connects back to BSS to relay information. You can add [Addons](https://github.com/mcSw4p/BungeeSpider-Suite/tree/master/Addons)
  to both BSS and BSC to build off of the server/client. 
 - - - -
 ## BungeeSpider Server Versions 
@@ -36,7 +37,7 @@ You can take a look at all the valid Server Messages in the "[Server Messages.tx
 >> We have a project that uses the PluginMessagingChannels but they require that a player be on the server to send messages. That typically means
  you run into stability issues.
 
-##
+##  
  
 > Will this cause my servers to lag more?
 >> Both the BungeeSpider-Server and the BungeeSpider-Client are actually pretty lightweight. The Server does nothing more than sit and wait to be told what 
@@ -44,7 +45,7 @@ to do by the client, so as long as the clients are not stressing the server ever
 more reasource intensive. But it is still very lightweight, not adding much to an existing spigot server. Ofcourse like you always hear, it all depends on 
 how many plugins/addons you have.
 
-##
+## 
 
 > Can I create a custom addon for my server?
 >> Yes. Both BungeeSpider-Server and BungeeSpider-Client can be added to your build path so you can build off of them. You can view the examples. You can also add Spigot or BungeeCord
