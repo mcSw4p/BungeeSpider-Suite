@@ -9,6 +9,8 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.util.logging.Logger;
 
+import com.google.common.base.Preconditions;
+
 import net.wynsolutions.bsc.BSCPluginLoader;
 import net.wynsolutions.bsc.config.Configuration;
 import net.wynsolutions.bsc.config.ConfigurationProvider;
@@ -27,38 +29,17 @@ public class Addon {
 		this.handler = hand;
 		this.setDescription(desc);
 	}
-	
-	public void onEnable(){}
-
-	public void onLoad()  {}
-
-	public void onDisable(){}
-
-	public AddonDescription getDescription() {
-		return description;
-	}
-
-	public void setDescription(AddonDescription description) {
-		this.description = description;
-	}
-
-	public Logger getLogger() {
-		return logger;
-	}
 
 	@SuppressWarnings("resource")
 	public InputStream getResourceAsStream(String filename) {
-		if (filename == null) {
-			throw new IllegalArgumentException("Filename cannot be null");
-		}
-
+		
+		Preconditions.checkNotNull(filename, "Cannot retrive file if file name is null!");
+	
 		try {
 			URL url = new URLClassLoader (new URL[]{description.getFile().toURI().toURL()}).getResource(filename);
 
-			if (url == null) {
-				return null;
-			}
-
+			Preconditions.checkNotNull(url, "Failed to retrive file. File does not exist [" + filename + "]");
+			
 			URLConnection connection = url.openConnection();
 			connection.setUseCaches(false);
 			return connection.getInputStream();
@@ -97,14 +78,39 @@ public class Addon {
 		}
     }
 
+	/**
+	 * Called when the Addon is enabling.
+	 */
+	public void onEnable(){}
+
+	/**
+	 * Called when the Addon is loading.
+	 */
+	public void onLoad()  {}
+
+	/**
+	 * Called when the Addon is disabling.
+	 */
+	public void onDisable(){}
+    
+	/**
+	 * @return Returns the Configuration.
+	 */
 	public Configuration getConfig() {
 		return config;
 	}
 
+	/**
+	 * Set the Configuration File.
+	 * @param config
+	 */
 	public void setConfig(Configuration config) {
 		this.config = config;
 	}
 	
+	/**
+	 * Save the Configuration file.
+	 */
 	public void saveConfig(){
 		try {
 			ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, configFile);
@@ -113,8 +119,32 @@ public class Addon {
 		}
 	}
 
+	/**
+	 * @return Returns the Addon Handler.
+	 */
 	public AddonHandler getHandler() {
 		return handler;
 	}
 	
+	/**
+	 * @return Returns the Description File
+	 */
+	public AddonDescription getDescription() {
+		return description;
+	}
+
+	/**
+	 * Set the Description file.
+	 * @param description
+	 */
+	public void setDescription(AddonDescription description) {
+		this.description = description;
+	}
+
+	/**
+	 * @return Returns the Addons Logger.
+	 */
+	public Logger getLogger() {
+		return logger;
+	}
 }

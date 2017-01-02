@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 
 import com.google.common.base.Preconditions;
 
@@ -41,62 +42,48 @@ public class AddonHandler {
 		this.scanForAddons(addonsDir);
 	}
 
-	@SuppressWarnings("unchecked")
+	public void reloadAddon(Addon par1){
+		Addon instance = this.getPluginMainClass(par1.getDescription());	
+		instance.onDisable();
+		System.out.println("[BSC] Disabled addon \"" + par1.getDescription().getName() + "\".");
+		instance.init(this, par1.getDescription());
+		instance.onLoad();
+		System.out.println("[BSC] Starting addon \"" + par1.getDescription().getName() + "\".");
+		instance.onEnable();
+		System.out.println("[BSC] Enabled addon \"" + par1.getDescription().getName() + "\" v" + par1.getDescription().getVersion() + " by " + par1.getDescription().getAuthor() + ".");
+		if(par1.getDescription().getDescription() != null && !par1.getDescription().getDescription().equals("")){
+			System.out.println("[BSC] " + par1.getDescription().getName() + ": " + par1.getDescription().getDescription());
+		}
+	}
+
+	public void reloadAddons(){
+		this.disableAddons();
+		this.loadAddons();
+	}
+
 	public void disableAddons(){
 		Debug.info("[+]Disabling addons[+]");
 		for(AddonDescription description : addonDescriptions.values()){
-			URLClassLoader child;
-			try {
-				child = new URLClassLoader (new URL[]{description.getFile().toURI().toURL()}, this.getClass().getClassLoader());
-				Class<? extends Addon> classToLoad = (Class<? extends Addon>) Class.forName (description.getMain(), true, child);
-				Addon instance = (Addon)classToLoad.newInstance();	
-				instance.onDisable();
-				System.out.println("[BSS] Disabled addon " + description.getName() + ".");
-				addons.remove(instance);
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				e.printStackTrace();
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
-
+			Addon instance = this.getPluginMainClass(description);	
+			instance.onDisable();
+			System.out.println("[BSC] Disabled addon \"" + description.getName() + "\".");
+			addons.remove(instance);
 		}	
 	}
 
-	@SuppressWarnings("unchecked")
 	private void loadAddons(){
 		Debug.info("[+]Starting addons[+]");
 		for(AddonDescription description : addonDescriptions.values()){
-			URLClassLoader child;
-			try {
-				child = new URLClassLoader (new URL[]{description.getFile().toURI().toURL()}, this.getClass().getClassLoader());
-				Class<? extends Addon> classToLoad = (Class<? extends Addon>) Class.forName (description.getMain(), true, child);
-				Addon instance = (Addon)classToLoad.newInstance();
-				instance.init(this, description);
-				instance.onLoad();
-				System.out.println("[BSC] Starting addon \"" + description.getName() + "\".");
-				instance.onEnable();
-				System.out.println("[BSC] Enabled addon \"" + description.getName() + "\" v" + description.getVersion() + " by " + description.getAuthor() + ".");
-				if(description.getDescription() != null && !description.getDescription().equals("")){
-					System.out.println("[BSC] " + description.getName() + ": " + description.getDescription());
-				}
-				addons.add(instance);
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				e.printStackTrace();
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
+			Addon instance = this.getPluginMainClass(description);
+			instance.init(this, description);
+			instance.onLoad();
+			System.out.println("[BSC] Starting addon \"" + description.getName() + "\".");
+			instance.onEnable();
+			System.out.println("[BSC] Enabled addon \"" + description.getName() + "\" v" + description.getVersion() + " by " + description.getAuthor() + ".");
+			if(description.getDescription() != null && !description.getDescription().equals("")){
+				System.out.println("[BSC] " + description.getName() + ": " + description.getDescription());
 			}
+			addons.add(instance);
 		}	
 	}
 
@@ -133,31 +120,52 @@ public class AddonHandler {
 		this.loadAddons();
 	}
 
+	private Addon getPluginMainClass(AddonDescription desc){
+		URLClassLoader child;
+		try {
+			child = new URLClassLoader (new URL[]{desc.getFile().toURI().toURL()}, this.getClass().getClassLoader());
+			Preconditions.checkNotNull(child, "Could not create class loader.");
+			Preconditions.checkNotNull(desc.getMain(), "Addon\'s Main class path has returned null.");
+			@SuppressWarnings("unchecked")
+			Class<? extends Addon> classToLoad = (Class<? extends Addon>) Class.forName (desc.getMain(), true, child);
+			Preconditions.checkNotNull(classToLoad, "Class from addon returned null after loading.");
+			Addon addon = (Addon)classToLoad.newInstance();
+			Preconditions.checkNotNull(addon, "Class was misshandled. Parsing to class \'Addon\' returned null.");
+			return addon;
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	private AddonDescription loadAddonDescriptionFile(Configuration con, AddonDescription aDesc){
 
-		if(con.contains("name")){
-			aDesc.setName(con.getString("name"));
-		}
-
-		if(con.contains("main")){
-			aDesc.setMain(con.getString("main"));
-		}
-
-		if(con.contains("version")){
-			aDesc.setVersion(con.getString("version"));
-		}
-
-		if(con.contains("author")){
-			aDesc.setAuthor(con.getString("author"));
-		}	
-
-		if(con.contains("description")){
+		Preconditions.checkArgument(con.contains("name"), "Could not load addon\'s name.");
+		aDesc.setName(con.getString("name"));
+		
+		Preconditions.checkArgument(con.contains("main"), "Could not load addon\'s main class.");
+		aDesc.setMain(con.getString("main"));
+		
+		Preconditions.checkArgument(con.contains("version"), "Could not load addon\'s version.");
+		aDesc.setVersion(con.getString("version"));
+		
+		Preconditions.checkArgument(con.contains("author"), "Could not load addon\'s author.");
+		aDesc.setAuthor(con.getString("author"));
+		
+		if(con.contains("description"))
 			aDesc.setDescription(con.getString("description"));
-		}
 
 		return aDesc;
 	}
-	
+
 	public Addon getAddon(String name){
 		for(Addon a : this.addons){
 			if(a.getDescription().getName().equalsIgnoreCase(name)){
@@ -171,9 +179,9 @@ public class AddonHandler {
 		Field bukkitCommandMap;
 		try {
 			bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
-			   bukkitCommandMap.setAccessible(true);
-			   CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
-			   commandMap.register(name, executor);
+			bukkitCommandMap.setAccessible(true);
+			CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
+			commandMap.register(name, executor);
 		} catch (NoSuchFieldException | SecurityException e1) {
 			e1.printStackTrace();
 		} catch (IllegalArgumentException e) {
@@ -182,17 +190,28 @@ public class AddonHandler {
 			e.printStackTrace();
 		}
 	}
- 
+	
+	public void registerListener(Listener list){
+		this.plugin.getMCServer().getPluginManager().registerEvents(list, this.plugin);
+	}
+
 	public Player getPlayerByName(String name){
 		return Bukkit.getPlayer(name);
 	}
-	
+
 	public String getServerIp(){
 		return plugin.getServerIP();
 	}
-	
+
 	public int getServerPort(){
 		return plugin.getServerPort();
 	}
-	
+
+	/**
+	 * @return the addonDescriptions
+	 */
+	public HashMap<String, AddonDescription> getAddonDescriptions() {
+		return addonDescriptions;
+	}
+
 }

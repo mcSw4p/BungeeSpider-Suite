@@ -3,7 +3,11 @@ package net.wynsolutions.bsc;
 import java.util.HashMap;
 
 import net.wynsolutions.bsc.addons.Addon;
+import net.wynsolutions.bsc.addons.AddonDescription;
+import net.wynsolutions.bsc.addons.AddonHandler;
+import net.wynsolutions.bsc.config.ShortcutConfig;
 import net.wynsolutions.bsc.debug.Debug;
+import net.wynsolutions.bsc.shortcuts.Shortcut;
 
 public class BSC {
 
@@ -24,7 +28,6 @@ public class BSC {
 	}
 	
 	/**
-	 * 
 	 * @return The BungeeSpider Server ip as set in the BungeeSpider-Client settings file.
 	 */
 	public static String getServerIp(){
@@ -32,7 +35,6 @@ public class BSC {
 	}
 	
 	/**
-	 * 
 	 * @return The BungeeSpider Server port as set in the BungeeSpider-Client settings file.
 	 */
 	public static int getServerPort(){
@@ -40,7 +42,6 @@ public class BSC {
 	}
 	
 	/**
-	 * 
 	 * @return The Current player count on the server.
 	 */
 	public static int getCurrentPlayerCount(){
@@ -48,7 +49,6 @@ public class BSC {
 	}
 	
 	/**
-	 * 
 	 * @return The Max player count on the server.
 	 */
 	public static int getMaxPlayers(){
@@ -56,11 +56,24 @@ public class BSC {
 	}
 	
 	/**
-	 * 
 	 * @return The server name as set in the BungeeSpider-Client settings file.
 	 */
 	public static String getServerName(){
 		return plug.getServerName();
+	}
+	
+	/**
+	 * @return The server timeout as set in the BungeeSpider-Client settings file.
+	 */
+	public static int getServerTimeout(){
+		return plug.getServerTimeout();
+	}
+	
+	/**
+	 * @return The Addon's handler for handling the Addon's on the BungeeSpider-Client.
+	 */
+	public static AddonHandler getHandler(){
+		return plug.getAddonHandler();
 	}
 	
 	/*
@@ -151,9 +164,19 @@ public class BSC {
 	 * Cancel all tasks related to a Addon.
 	 * @param add
 	 */
-	public static void cancelAllTaskForAddon(Addon add){
+	public static void cancelAllTaskForAddon(String addStr){
+		
+		AddonDescription desc = null;
+		
 		for(String s : tasks.keySet()){
-			if(s.equalsIgnoreCase(add.getDescription().getName())){
+			if(desc == null){
+			for(AddonDescription ad : plug.getAddonHandler().getAddonDescriptions().values()){
+				if(ad.getName().equalsIgnoreCase(addStr)){
+					desc = ad;
+				}
+			}
+			}
+			if(s.equalsIgnoreCase(desc.getName())){
 				plug.getServer().getScheduler().cancelTask(tasks.get(s));
 				tasks.remove(s);
 			}
@@ -163,5 +186,24 @@ public class BSC {
 	/*
 	 * End of Schedule Methods
 	 */
+	
+	/**
+	 * @param name
+	 * @param permission
+	 * @param command
+	 * @return Creates a new shortcut instance that can be added to the list.
+	 */
+	public static Shortcut createShortCut(String name, String permission, String command){
+		return new Shortcut(name, permission, command);
+	}
+	
+	/**
+	 * Adds a shortcut to the BungeeSpider-Client shortcuts list.
+	 * @param par
+	 */
+	public static void addShortCut(Shortcut par){
+		if(!ShortcutConfig.getShortcutsNames().contains(par.getName()))
+			ShortcutConfig.addShortcut(par);
+	}
 	
 }

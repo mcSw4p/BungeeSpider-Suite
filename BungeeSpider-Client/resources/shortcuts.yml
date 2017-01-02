@@ -1,0 +1,11 @@
+# Shortcut configuration file
+# Example:
+# update:
+#   permission: bsc.update
+#   command: bsc update
+shortcuts:
+  permission: bsc.shortcuts
+  command: bsc sc
+update:
+  permission: bsc.update
+  command: bsc update
