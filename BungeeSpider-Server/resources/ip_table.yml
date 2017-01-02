@@ -7,7 +7,7 @@
 # When the server does not recognize an ip, should it allow the connection or block it?
 # If it is allowed, then it will be logged in the console.
 
-unrecognized-ip-allow: false
+unrecognized-ip-allow: true
 
 # Allowed ip's
 allow:

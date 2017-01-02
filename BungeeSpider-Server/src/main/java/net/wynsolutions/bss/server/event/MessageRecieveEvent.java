@@ -9,14 +9,15 @@ public class MessageRecieveEvent extends EventObject{
 
 	private boolean canceled = false;
 	private BufferedReader input;
-	private String clientIp;
+	private String clientIp, sockInput;
 	private Socket client;
 	
-	public MessageRecieveEvent(BufferedReader io, String parIp, Socket sock) {
+	public MessageRecieveEvent(BufferedReader io,String pInput, String parIp, Socket sock) {
 		super(io);
 		this.setInput(io);
 		this.setClientIp(parIp);
 		this.setClient(sock);
+		this.setSockInput(pInput);
 	}
 
 	public boolean isCanceled() {
@@ -49,6 +50,14 @@ public class MessageRecieveEvent extends EventObject{
 
 	public void setClient(Socket client) {
 		this.client = client;
+	}
+
+	public String getSockInput() {
+		return sockInput;
+	}
+
+	public void setSockInput(String sockInput) {
+		this.sockInput = sockInput;
 	}
 
 }

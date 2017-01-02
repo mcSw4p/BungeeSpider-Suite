@@ -39,9 +39,8 @@ public class BSServerInputHandler {
 		
 		String ip = this.clientSocket.getInetAddress().getHostAddress();
 		
-		Debug.info("Handling client " + ip + ", input command: " + this.input);
-		
 		if(IpTableConfig.getBlockedIps().contains(ip)){
+			Debug.info("Client \'" + ip + "\' was blocked.");
 			return;
 		}
 		
@@ -57,15 +56,26 @@ public class BSServerInputHandler {
 				return;
 			}
 		}
+		Debug.info("Client \'" + ip + "\' made it past firewall.");
 		
 		this.out = new PrintWriter(clientSocket.getOutputStream(), true);
 		in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		this.input = in.readLine();
 		
+		Debug.info("Handling client " + ip + ", input command: " + this.input);
+		
+		if(this.input == null){
+			Debug.severe("Client \'" + ip + "\' sent a null subcommand!");
+			this.clientSocket.close();
+			return;
+		}
+		
 		// Add Event listener for addon hooks
 		
-		MessageRecieveEvent event = EventHandler.fireMessageEvent(new MessageRecieveEvent(in, ip, clientSocket));
+		Debug.info("Firing Message recieve event.");
+		MessageRecieveEvent event = EventHandler.fireMessageEvent(new MessageRecieveEvent(in, this.input, ip, clientSocket));
 		if(event.isCanceled()){
+			Debug.warn("Event Cancelled by another addon.");
 			this.clientSocket.close();
 			return;
 		}

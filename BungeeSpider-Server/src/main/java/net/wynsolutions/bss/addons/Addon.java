@@ -3,9 +3,14 @@ package net.wynsolutions.bss.addons;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.net.URLConnection;
+import java.nio.file.Files;
 import java.util.logging.Logger;
 
 import net.wynsolutions.bss.BSSLaunch;
+import net.wynsolutions.bss.BSSPluginLoader;
 import net.wynsolutions.bss.config.Configuration;
 import net.wynsolutions.bss.config.ConfigurationProvider;
 import net.wynsolutions.bss.config.YamlConfiguration;
@@ -13,7 +18,6 @@ import net.wynsolutions.bss.config.YamlConfiguration;
 public class Addon {
 	
 	private AddonDescription description;
-	private Logger logger = Logger.getLogger(Addon.class.getName());
 	private AddonHandler handler;
 	
 	private File configFile;
@@ -45,24 +49,46 @@ public class Addon {
 	}
 
 	public Logger getLogger() {
-		return logger;
+		return BSSPluginLoader.logger;
 	}
 
-    public final InputStream getResourceAsStream(String name) {
-        return getClass().getClassLoader().getResourceAsStream(name);
-    }
+	@SuppressWarnings("resource")
+	public InputStream getResourceAsStream(String filename) {
+		if (filename == null) {
+			throw new IllegalArgumentException("Filename cannot be null");
+		}
+
+		try {
+			URL url = new URLClassLoader (new URL[]{description.getFile().toURI().toURL()}).getResource(filename);
+
+			if (url == null) {
+				return null;
+			}
+
+			URLConnection connection = url.openConnection();
+			connection.setUseCaches(false);
+			return connection.getInputStream();
+		} catch (IOException ex) {
+			return null;
+		}
+	}
     
     public final File getDataFolder(){
     	return new File(BSSLaunch.getDataFolder().getPath() + File.separatorChar + "addons" + File.separatorChar + description.getName());
     }
     
-    public void setupConfig(){
+    public void setupConfig(InputStream in){
     	if(configFile == null){
-			configFile = new File(getDataFolder(), "config.yml");
+    		
+    		if(!getDataFolder().exists()){
+    			getDataFolder().mkdir();
+    		}
+    		
+			configFile = new File(getDataFolder().getAbsolutePath(), "config.yml");
 
 	        if (!configFile.exists()) {
-	        	try {
-					configFile.createNewFile();
+				  try {
+					Files.copy(in, configFile.toPath());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

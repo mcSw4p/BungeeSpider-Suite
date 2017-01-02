@@ -2,11 +2,12 @@ package net.wynsolutions.bss.debug;
 
 import java.util.logging.Logger;
 
+import net.wynsolutions.bss.BSSPluginLoader;
 import net.wynsolutions.bss.config.ServerPropertiesConfig;
 
 public class Debug {
 
-	private static Logger logger = Logger.getLogger("BSS Debug");
+	private static Logger logger = BSSPluginLoader.logger;
 	
 	public static void info(String msg){
 		if(ServerPropertiesConfig.isDebug())

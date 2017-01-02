@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.wynsolutions.bss.BSSLaunch;
+import net.wynsolutions.bss.debug.Debug;
 
 public class BSServer extends Thread{
 
@@ -27,6 +28,7 @@ public class BSServer extends Thread{
 
 		try {
 			serverListener = new ServerSocket(plugin.getServerPort());
+			Debug.info("Listening on " + serverListener.getInetAddress().getHostAddress() + ":" + serverListener.getLocalPort());
 			while(true){
 				new BSServerInputHandler(serverListener.accept());
 			}

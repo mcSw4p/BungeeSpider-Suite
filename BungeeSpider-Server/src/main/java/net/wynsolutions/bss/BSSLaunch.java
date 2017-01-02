@@ -12,7 +12,6 @@ import net.wynsolutions.bss.config.RecipientsConfig;
 import net.wynsolutions.bss.config.ServerPropertiesConfig;
 import net.wynsolutions.bss.email.Email;
 import net.wynsolutions.bss.server.BSServer;
-import net.wynsolutions.bss.server.Scheduler;
 import net.wynsolutions.bss.server.ServerDeadTrigger;
 
 public class BSSLaunch{
@@ -58,7 +57,6 @@ public class BSSLaunch{
 
 	public void onDisable() {
 		saveConfig();
-		Scheduler.executorService.shutdown();
 		this.addons.disableAddons();
 	}
 
@@ -153,5 +151,4 @@ public class BSSLaunch{
 	public static File getDataFolder(){
 		return serverJar;
 	}
-
 }
