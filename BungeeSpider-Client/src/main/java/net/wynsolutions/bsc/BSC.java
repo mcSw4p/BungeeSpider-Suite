@@ -1,5 +1,6 @@
 package net.wynsolutions.bsc;
 
+import java.io.File;
 import java.util.HashMap;
 
 import net.wynsolutions.bsc.addons.Addon;
@@ -74,6 +75,13 @@ public class BSC {
 	 */
 	public static AddonHandler getHandler(){
 		return plug.getAddonHandler();
+	}
+	
+	/**
+	 * @return The Data folder of the BungeeSpider-Client plugin
+	 */
+	public static File getDataFolder(){
+		return plug.getDataFolder();
 	}
 	
 	/*

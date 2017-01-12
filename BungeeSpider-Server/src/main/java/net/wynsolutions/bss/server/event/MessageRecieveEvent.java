@@ -1,6 +1,7 @@
 package net.wynsolutions.bss.server.event;
 
 import java.io.BufferedReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.EventObject;
 
@@ -9,15 +10,17 @@ public class MessageRecieveEvent extends EventObject{
 
 	private boolean canceled = false;
 	private BufferedReader input;
+	private PrintWriter output;
 	private String clientIp, sockInput;
 	private Socket client;
 	
-	public MessageRecieveEvent(BufferedReader io,String pInput, String parIp, Socket sock) {
+	public MessageRecieveEvent(BufferedReader io, PrintWriter out, String pInput, String parIp, Socket sock) {
 		super(io);
 		this.setInput(io);
 		this.setClientIp(parIp);
 		this.setClient(sock);
 		this.setSockInput(pInput);
+		this.setOutput(out);
 	}
 
 	public boolean isCanceled() {
@@ -58,6 +61,20 @@ public class MessageRecieveEvent extends EventObject{
 
 	public void setSockInput(String sockInput) {
 		this.sockInput = sockInput;
+	}
+
+	/**
+	 * @return the output
+	 */
+	public PrintWriter getOutput() {
+		return output;
+	}
+
+	/**
+	 * @param output the output to set
+	 */
+	public void setOutput(PrintWriter output) {
+		this.output = output;
 	}
 
 }

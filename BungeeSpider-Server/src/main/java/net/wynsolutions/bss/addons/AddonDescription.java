@@ -31,6 +31,11 @@ public class AddonDescription {
     private String author;
     
     /**
+     * Addon server tag.
+     */
+    private String server;
+    
+    /**
      * Plugin hard dependencies.
      */
     private Set<String> depends = new HashSet<>();
@@ -49,44 +54,71 @@ public class AddonDescription {
      * Optional description.
      */
     private String description = null;
-    
-	public String getName() {
-		return name;
-	}
 	
-	public String getMain() {
-		return main;
-	}
-	
-	public String getVersion() {
-		return version;
-	}
-	
-	public String getAuthor() {
-		return author;
-	}
-	
-	public Set<String> getDepends() {
-		return depends;
-	}
-	
-	public Set<String> getSoftDepends() {
-		return softDepends;
-	}
-	
+    /**
+	 * @return the file
+	 */
 	public File getFile() {
 		return file;
 	}
-	
-	public void setFile(File file){
+
+	/**
+	 * @param file the file to set
+	 */
+	public void setFile(File file) {
 		this.file = file;
 	}
-	
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @return the main
+	 */
+	public String getMain() {
+		return main;
+	}
+
+	/**
+	 * @return the version
+	 */
+	public String getVersion() {
+		return version;
+	}
+
+	/**
+	 * @return the author
+	 */
+	public String getAuthor() {
+		return author;
+	}
+
+	/**
+	 * @return the depends
+	 */
+	public Set<String> getDepends() {
+		return depends;
+	}
+
+	/**
+	 * @return the softDepends
+	 */
+	public Set<String> getSoftDepends() {
+		return softDepends;
+	}
+
+	/**
+	 * @return the description
+	 */
 	public String getDescription() {
 		return description;
 	}
-	
-    /**
+
+	/**
 	 * @param name the name to set
 	 */
 	public void setName(String name) {
@@ -133,5 +165,19 @@ public class AddonDescription {
 	 */
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	/**
+	 * @return the server
+	 */
+	public String getServer() {
+		return server;
+	}
+
+	/**
+	 * @param server the server to set
+	 */
+	public void setServer(String server) {
+		this.server = server;
 	}
 }

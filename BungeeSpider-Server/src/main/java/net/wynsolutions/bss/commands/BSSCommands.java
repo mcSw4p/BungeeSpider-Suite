@@ -6,6 +6,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.wynsolutions.bss.BSSLaunch;
+import net.wynsolutions.bss.addons.AddonDownloader;
 import net.wynsolutions.bss.config.IpTableConfig;
 
 public class BSSCommands extends Command{
@@ -15,13 +16,13 @@ public class BSSCommands extends Command{
 	}
 
 	@Override public void execute(CommandSender sender, String[] args) {
-		
+
 		if(args.length > 0){
 			if(args[0].equalsIgnoreCase("list")){
 				if(sender.hasPermission("bss.server.list") || !(sender instanceof ProxiedPlayer)){
 					sender.sendMessage(new ComponentBuilder("Server List").color(ChatColor.GOLD).create());
 					for(String s : BSSLaunch.serverStatus.keySet()){
-						
+
 						if(BSSLaunch.serverStatus.get(s))
 							sender.sendMessage(new ComponentBuilder("- " + s + " : " + ChatColor.GOLD + BSSLaunch.serverStatus.get(s).toString()).color(ChatColor.GREEN).create());
 						else
@@ -42,11 +43,11 @@ public class BSSCommands extends Command{
 									flag = true;
 								}
 							}
-							
+
 							i++;
-							
+
 						}
-						
+
 						if(flag){
 							//Not ip - check if it is a server name
 						}else{
@@ -75,6 +76,28 @@ public class BSSCommands extends Command{
 				}else{
 					sender.sendMessage(new ComponentBuilder("Correct usage - /bss addip [ip].").color(ChatColor.RED).create());
 				}
+			}else if(args[0].equalsIgnoreCase("install-addon") || args[0].equalsIgnoreCase("iadn")){
+
+				if(sender.hasPermission("bss.server.installaddon")){
+					// Just url
+					if(args.length == 2){
+						if(args[1].startsWith("http://")){
+							AddonDownloader addl = new AddonDownloader(args[1]);
+							if(addl.startInstallation()){
+								sender.sendMessage(new ComponentBuilder("Finished installing addon.").color(ChatColor.GREEN).create());
+							}else{
+								sender.sendMessage(new ComponentBuilder("There was an error while installing the addon. Maybe the URL is not direct?").color(ChatColor.RED).create());
+							}	
+						}else{
+							sender.sendMessage(new ComponentBuilder("Correct usage - /bss downloadaddon [url] <name>.").color(ChatColor.RED).create());
+						}
+					}else{
+						sender.sendMessage(new ComponentBuilder("Correct usage - /bss downloadaddon [url] <name>.").color(ChatColor.RED).create());
+					}
+
+				}else{
+					sender.sendMessage(new ComponentBuilder("You are not allowed to do that. Please contact the administrators.").color(ChatColor.RED).create());
+				}	
 			}
 		}else{
 			//Show menu of commands
@@ -83,7 +106,7 @@ public class BSSCommands extends Command{
 			sender.sendMessage(new ComponentBuilder("- /bss addip [ip] = Add a trusted ip for servers.").color(ChatColor.GREEN).create());
 			sender.sendMessage(new ComponentBuilder("- /bss ping [servername/ip] = Ping a single server to see if it\'s alive.").color(ChatColor.GREEN).create());
 		}
-		
+
 	}
 
 }

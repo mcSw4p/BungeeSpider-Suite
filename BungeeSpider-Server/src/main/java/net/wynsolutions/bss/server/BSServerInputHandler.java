@@ -70,16 +70,6 @@ public class BSServerInputHandler {
 			return;
 		}
 		
-		// Add Event listener for addon hooks
-		
-		Debug.info("Firing Message recieve event.");
-		MessageRecieveEvent event = EventHandler.fireMessageEvent(new MessageRecieveEvent(in, this.input, ip, clientSocket));
-		if(event.isCanceled()){
-			Debug.warn("Event Cancelled by another addon.");
-			this.clientSocket.close();
-			return;
-		}
-		
 		// Client was accepted, now handle the input
 		
 		if(input.equalsIgnoreCase("hello")){
@@ -123,6 +113,14 @@ public class BSServerInputHandler {
 				new Email(subject, msg, s);
 			}
 			Debug.info("Recieved amessage command");
+		}else{
+			// Add Event listener for addon hooks
+			
+			Debug.info("Firing Message recieve event.");
+			MessageRecieveEvent event = EventHandler.fireMessageEvent(new MessageRecieveEvent(in, out, this.input, ip, clientSocket));
+			if(event.isCanceled()){
+				Debug.warn("Event Canceled by another addon.");
+			}
 		}
 		
 		//Send the message back

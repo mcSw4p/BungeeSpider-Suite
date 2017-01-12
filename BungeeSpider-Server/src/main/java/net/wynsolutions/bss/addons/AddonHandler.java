@@ -18,12 +18,15 @@ import net.wynsolutions.bss.config.Configuration;
 import net.wynsolutions.bss.config.ConfigurationProvider;
 import net.wynsolutions.bss.config.YamlConfiguration;
 import net.wynsolutions.bss.debug.Debug;
+import net.wynsolutions.bss.server.event.BungeeSpiderListener;
+import net.wynsolutions.bss.server.event.EventHandler;
 
 public class AddonHandler {
 
 	private File addonsDir;
 
 	private HashMap<String, AddonDescription> addonDescriptions = new HashMap<String, AddonDescription>();
+	private HashMap<String, URLClassLoader> addonClassLoaders = new HashMap<String, URLClassLoader>();
 	private List<Addon> addons = new ArrayList<Addon>();
 
 	public AddonHandler() {
@@ -58,6 +61,9 @@ public class AddonHandler {
 			instance.onDisable();
 			System.out.println("[BSS] Disabled addon \"" + description.getName() + "\".");
 			addons.remove(instance);
+			addonDescriptions.remove(instance.getDescription().getName());
+			addonClassLoaders.get(description.getName()).clearAssertionStatus();
+			addonClassLoaders.remove(description.getName());
 		}	
 	}
 
@@ -121,6 +127,7 @@ public class AddonHandler {
 			Preconditions.checkNotNull(classToLoad, "Class from addon returned null after loading.");
 			Addon addon = (Addon)classToLoad.newInstance();
 			Preconditions.checkNotNull(addon, "Class was misshandled. Parsing to class \'Addon\' returned null.");
+			this.addonClassLoaders.put(desc.getName(), child);
 			return addon;
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -152,6 +159,12 @@ public class AddonHandler {
 		
 		if(con.contains("description"))
 			aDesc.setDescription(con.getString("description"));
+		
+		if(con.contains("server"))
+			aDesc.setServer(con.getString("server"));
+		else{
+			Preconditions.checkArgument(con.contains("server"), "Addon(" + aDesc.getName() + ") is not a server addon or does not have the server tag in spider.yml");
+		}
 
 		return aDesc;
 	}
@@ -164,9 +177,47 @@ public class AddonHandler {
 		}
 		return null;
 	}
+	
+	public void disableAddon(Addon a){
+		a.onDisable();
+		addons.remove(a);
+		addonClassLoaders.get(a.getDescription().getName()).clearAssertionStatus();
+		addonClassLoaders.remove(a.getDescription().getName());
+	}
+	
+	public void enableAddon(AddonDescription desc){
+		Addon add = this.getPluginMainClass(desc);
+		add.init(this, desc);
+		add.onLoad();
+		add.onEnable();
+		addons.add(add);
+	}
+	
+	public void downloadAddon(){
+		
+	}
 
 	public int getServerPort(){
 		return BSSLaunch.instance.getServerPort();
+	}
+	
+	public void addMessageListener(BungeeSpiderListener par){
+		EventHandler.addMessageEventListener(par);
+	}
+	
+	public void removeMessageListener(BungeeSpiderListener par){
+		EventHandler.removeMessageEventListener(par);
+	}
+	
+	public boolean addonExists(String name){
+		
+		for(Addon a : this.addons){
+			if(a.getDescription().getName().equalsIgnoreCase(name)){
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 }

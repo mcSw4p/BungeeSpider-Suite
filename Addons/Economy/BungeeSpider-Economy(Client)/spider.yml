@@ -2,3 +2,4 @@ name: BungeeSpider-Economy(Client)
 main: net.wynsolutions.bscecon.BSCEconAddon
 version: 0.0.1
 author: Sw4p
+client: yes

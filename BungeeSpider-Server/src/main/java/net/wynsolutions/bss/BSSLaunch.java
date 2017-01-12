@@ -53,6 +53,7 @@ public class BSSLaunch{
 
 		this.addons = new AddonHandler();
 
+		new BSS(this);
 	}
 
 	public void onDisable() {
@@ -150,5 +151,9 @@ public class BSSLaunch{
 
 	public static File getDataFolder(){
 		return serverJar;
+	}
+	
+	public AddonHandler getAddonHandler(){
+		return this.addons;
 	}
 }

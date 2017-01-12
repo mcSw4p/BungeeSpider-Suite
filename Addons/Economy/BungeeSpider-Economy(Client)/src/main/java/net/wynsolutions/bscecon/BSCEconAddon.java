@@ -187,7 +187,7 @@ public class BSCEconAddon extends Addon{
 								Player p;
 								double b;
 								if((p = getHandler().getPlayerByName(arg2[1])) != null){
-									try{
+									try{ 
 										b = Double.parseDouble(arg2[2]);
 									}catch(NumberFormatException e){
 										arg0.sendMessage(ChatColor.RED + "\"" + arg2[2] + "\" is not a number!");

@@ -3,6 +3,11 @@ The BungeeSpider-EventNotifier(Client) is an addon the monitors TPS, Player Coun
 either a single email address or to a assigned group from the Recipients Config on your BungeeSpider-Server server. You can enable and disable each monitor seperatly 
 if you desire. Each monitor can be checked with a command on the server aswell. 
  
+## How to install
+Enter this command from the console or a player with permission "bsc.cmd.installaddon":
+`
+  /bsc iadn <direct url to addon jar>
+`
 ## Commands
 * 'bsen'
  * Shows a list of all commands

@@ -11,6 +11,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.wynsolutions.bsc.addons.AddonDownloader;
 import net.wynsolutions.bsc.addons.AddonHandler;
 import net.wynsolutions.bsc.commands.AddonsCommand;
 import net.wynsolutions.bsc.config.ShortcutConfig;
@@ -26,7 +28,7 @@ public class BSCPluginLoader extends BSCPlugin{
 	private AddonHandler addonHandler;
 	private ShortcutConfig shortcutConfig;
 	
-	@Override public void onEnable() {
+	@Override public void onEnable() { 
 
 		instance = this;
 		
@@ -116,11 +118,35 @@ public class BSCPluginLoader extends BSCPlugin{
 						sender.sendMessage(ChatColor.RED + "You are not allowed to do that!");
 						return false;
 					}
+				}else if(args[0].equalsIgnoreCase("install-addon") || args[0].equalsIgnoreCase("iadn")){
+					
+					if(sender.hasPermission("bsc.cmd.installaddon")){
+						if(args.length == 2){
+							// Just url
+							if(args[1].startsWith("http://")){
+								AddonDownloader addl = new AddonDownloader(args[1]);
+								if(addl.startInstallation()){
+									sender.sendMessage(ChatColor.GREEN + "Finished installing addon.");
+								}else{
+									sender.sendMessage(ChatColor.RED + "There was an error while installing the addon. Maybe the URL is not direct?");
+								}	
+							}else{
+								sender.sendMessage(ChatColor.RED + "Correct usage - /bss downloadaddon [url] <name>.");
+							}
+						}else{
+							sender.sendMessage(ChatColor.RED + "Correct usage - /bss downloadaddon [url] <name>.");
+						}
+
+					}else{
+						sender.sendMessage(ChatColor.RED + "You are not allowed to do that!");
+					}	
+					
 				}else{
 					sender.sendMessage(ChatColor.RED + "Unreconized command!");
 					sender.sendMessage(ChatColor.GOLD + "BungeeSpider-Client Commands:");
 					sender.sendMessage(ChatColor.GREEN + "- /bsc [update] = Update this server to the main server.");	
 					sender.sendMessage(ChatColor.GREEN + "- /bsc [shortcuts/sc] = List all shortcut names.");	
+					sender.sendMessage(ChatColor.GREEN + "- /bsc [install-addon/iadn] [url]= List all shortcut names.");	
 					return false;
 				}
 

@@ -75,7 +75,7 @@ public class BSENAddon extends Addon{
 		
 		getLogger().info("[BSEN] Disabling BungeeSpider-EventNotifier"); // Notify Console that BSEN is disabling
 		
-		BSC.cancelAllTaskForAddon(this); // WIP | Cancel all the active tasks for this addon
+		BSC.cancelAllTaskForAddon("BungeeSpider-EventNotifier(Client)"); // Cancel all the active tasks for this addon
 		
 		super.onDisable(); // Call parent method
 	}

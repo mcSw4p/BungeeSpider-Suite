@@ -1,25 +1,25 @@
 package net.wynsolutions.bss.server.event;
 
-import javax.swing.event.EventListenerList;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.wynsolutions.bss.debug.Debug;
 
 public class EventHandler {
-
-	protected static EventListenerList listenerList = new EventListenerList();
+	private static List<BungeeSpiderListener> listeners = new ArrayList<BungeeSpiderListener>();
 
 	public static void addMessageEventListener(BungeeSpiderListener listener) {
-		listenerList.add(BungeeSpiderListener.class, listener);
+		listeners.add(listener);
 	}
 
 	public static void removeMessageEventListener(BungeeSpiderListener listener) {
-		listenerList.remove(BungeeSpiderListener.class, listener);
+		listeners.remove(listener);
 	}
 
 	public static MessageRecieveEvent fireMessageEvent(MessageRecieveEvent evt) {
-		Object[] listeners = listenerList.getListenerList();
-		for (int i = 0; i < listeners.length; i = i+2) {
-			if (listeners[i] == BungeeSpiderListener.class) {
-				((BungeeSpiderListener) listeners[i+1]).messageRecieved(evt);
-			}
+		for(BungeeSpiderListener bsl : listeners){
+			Debug.info("Running message through listener " + bsl.toString());
+			bsl.messageRecieved(evt);
 		}
 		return evt;
 	}

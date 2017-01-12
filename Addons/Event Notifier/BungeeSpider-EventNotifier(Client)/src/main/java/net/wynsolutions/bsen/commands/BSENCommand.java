@@ -92,7 +92,7 @@ public class BSENCommand extends Command{
 					if(arg0.hasPermission("bsen.check.pc")){ // Does the sender have the correct permissions?
 						if(arg3.length == 1){ // Is the Argument length equal to 1?
 							String playerCount = ChatColor.AQUA + "" + this.add.getPlayerCountMonitor().getCurrentPlayerCount() + ""; // Load Player count 
-							if(this.add.getPlayerCountMonitor().getCurrentPlayerCount() >= this.add.getPlayerCountThreshold()) // Is Player count over the Threshold?
+							if(this.add.getPlayerCountMonitor().getCurrentPlayerCount() >= (BSC.getMaxPlayers() - this.add.getPlayerCountThreshold())) // Is Player count over the Threshold?
 								playerCount = ChatColor.RED + "" + this.add.getPlayerCountMonitor().getCurrentPlayerCount() + ""; // Set Player count to RED
 							arg0.sendMessage(ChatColor.GREEN + "Current player count is " + playerCount + ChatColor.GREEN + "."); // Send message for Player count
 							return true; // Return method
@@ -101,7 +101,7 @@ public class BSENCommand extends Command{
 							arg0.sendMessage(ChatColor.GREEN + "Current player count/ settings:"); // Send Command Title message
 							
 							String playerCount = ChatColor.AQUA + "" + this.add.getPlayerCountMonitor().getCurrentPlayerCount() + ""; // Load Player count 
-							if(this.add.getPlayerCountMonitor().getCurrentPlayerCount() >= this.add.getPlayerCountThreshold()) // Is Player count over the threshold?
+							if(this.add.getPlayerCountMonitor().getCurrentPlayerCount() >= (BSC.getMaxPlayers() - this.add.getPlayerCountThreshold())) // Is Player count over the threshold?
 								playerCount = ChatColor.RED + "" + this.add.getPlayerCountMonitor().getCurrentPlayerCount() + ""; // Set Player count to RED
 							arg0.sendMessage(ChatColor.GREEN + "Current player count is " + playerCount + ChatColor.GREEN + "."); // Send message for Player count
 							arg0.sendMessage(ChatColor.GREEN + "Maximum player count is " + ChatColor.AQUA + BSC.getMaxPlayers() + ChatColor.GREEN + "."); // Send message for Max Player count

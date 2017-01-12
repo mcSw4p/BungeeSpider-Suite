@@ -31,6 +31,11 @@ public class AddonDescription {
     private String author;
     
     /**
+     * Addon Client tag
+     */
+    private String client;
+    
+    /**
      * Plugin hard dependencies.
      */
     private Set<String> depends = new HashSet<>();
@@ -133,5 +138,19 @@ public class AddonDescription {
 	 */
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	/**
+	 * @return the client
+	 */
+	public String getClient() {
+		return client;
+	}
+
+	/**
+	 * @param client the client to set
+	 */
+	public void setClient(String client) {
+		this.client = client;
 	}
 }

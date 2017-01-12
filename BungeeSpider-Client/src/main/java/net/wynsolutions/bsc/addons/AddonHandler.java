@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 import com.google.common.base.Preconditions;
@@ -32,6 +33,7 @@ public class AddonHandler {
 	private File addonsDir;
 
 	private HashMap<String, AddonDescription> addonDescriptions = new HashMap<String, AddonDescription>();
+	private HashMap<String, URLClassLoader> addonClassLoaders = new HashMap<String, URLClassLoader>();
 	private List<Addon> addons = new ArrayList<Addon>();
 
 	public AddonHandler(BSCPluginLoader plug) {
@@ -68,6 +70,9 @@ public class AddonHandler {
 			instance.onDisable();
 			System.out.println("[BSC] Disabled addon \"" + description.getName() + "\".");
 			addons.remove(instance);
+			addonDescriptions.remove(instance.getDescription().getName());
+			addonClassLoaders.get(description.getName()).clearAssertionStatus();
+			addonClassLoaders.remove(description.getName());
 		}	
 	}
 
@@ -131,6 +136,7 @@ public class AddonHandler {
 			Preconditions.checkNotNull(classToLoad, "Class from addon returned null after loading.");
 			Addon addon = (Addon)classToLoad.newInstance();
 			Preconditions.checkNotNull(addon, "Class was misshandled. Parsing to class \'Addon\' returned null.");
+			this.addonClassLoaders.put(desc.getName(), child);
 			return addon;
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -191,8 +197,38 @@ public class AddonHandler {
 		}
 	}
 	
+	public void disableAddon(Addon a){
+		a.onDisable();
+		addons.remove(a);
+		addonClassLoaders.get(a.getDescription().getName()).clearAssertionStatus();
+		addonClassLoaders.remove(a.getDescription().getName());
+	}
+	
+	public void enableAddon(AddonDescription desc){
+		Addon add = this.getPluginMainClass(desc);
+		add.init(this, desc);
+		add.onLoad();
+		add.onEnable();
+		addons.add(add);
+	}
+	
+	public boolean addonExists(String name){
+		
+		for(Addon a : this.addons){
+			if(a.getDescription().getName().equalsIgnoreCase(name)){
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	public void registerListener(Listener list){
 		this.plugin.getMCServer().getPluginManager().registerEvents(list, this.plugin);
+	}
+	
+	public void unregisterListener(Listener list){
+		HandlerList.unregisterAll(list);
 	}
 
 	public Player getPlayerByName(String name){

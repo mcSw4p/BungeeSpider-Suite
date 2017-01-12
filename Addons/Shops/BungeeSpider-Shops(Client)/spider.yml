@@ -1,0 +1,5 @@
+name: BungeeSpider-Shops(Client)
+main: net.wynsolutions.bssh.BSSHAddon
+version: 0.0.1
+author: Sw4p
+client: yes

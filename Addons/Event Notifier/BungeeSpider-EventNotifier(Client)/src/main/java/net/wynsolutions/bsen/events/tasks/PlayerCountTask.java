@@ -36,7 +36,7 @@ public class PlayerCountTask implements Runnable{
 	 */
 	@Override public void run() {
 		this.plug.getPlayerCountMonitor().updatePlayerCountStats(); // Update Statistics
-		if(this.plug.getPlayerCountMonitor().getCurrentPlayerCount() >= this.plug.getPlayerCountThreshold()){ // Is Player count greater than the Threshold?
+		if(this.plug.getPlayerCountMonitor().getCurrentPlayerCount() >= (BSC.getMaxPlayers() - this.plug.getPlayerCountThreshold())){ // Is Player count greater than the Threshold?
 			String command = "message"; // Initialize command String
 			if(this.plug.isPlayerCountEnabled()){ // Is the To String a group?
 				command = "gmessage"; // Set command String to group message

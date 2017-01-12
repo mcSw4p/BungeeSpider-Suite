@@ -30,8 +30,7 @@ public class TicketCommand extends Command{
 					if(player.hasPermission("bst.ticket.create")){
 						
 					}
-					
-					
+									
 				}
 				
 			}else{

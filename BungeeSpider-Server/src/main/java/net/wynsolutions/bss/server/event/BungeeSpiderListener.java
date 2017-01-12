@@ -4,6 +4,6 @@ import java.util.EventListener;
 
 public interface BungeeSpiderListener extends EventListener{
 
-	public void messageRecieved(MessageRecieveEvent evt);
+	void messageRecieved(MessageRecieveEvent evt);
 	
 }
