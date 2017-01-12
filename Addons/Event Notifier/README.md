@@ -4,10 +4,10 @@ either a single email address or to a assigned group from the Recipients Config 
 if you desire. Each monitor can be checked with a command on the server aswell. 
  
 ## How to install
-Enter this command from the console or a player with permission "bsc.cmd.installaddon":
-`
+Enter this command from the console or a player with permission "bsc.cmd.installaddon":  
+```
   /bsc iadn <direct url to addon jar>
-`
+```
 ## Commands
 * 'bsen'
  * Shows a list of all commands
