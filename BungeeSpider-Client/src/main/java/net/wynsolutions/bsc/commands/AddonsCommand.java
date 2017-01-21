@@ -5,7 +5,6 @@ import org.bukkit.command.CommandSender;
 
 import net.md_5.bungee.api.ChatColor;
 import net.wynsolutions.bsc.addons.Addon;
-import net.wynsolutions.bsc.addons.AddonDescription;
 import net.wynsolutions.bsc.api.BSC;
 import net.wynsolutions.bsc.api.debug.Debug;
 /**
