@@ -4,7 +4,7 @@
 
   <groupId>BungeeSpider-Client</groupId>
   <artifactId>BungeeSpider-Client</artifactId>
-  <version>0.0.4-SNAPSHOT</version>
+  <version>0.0.5-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>BungeeSpider-Client</name>
@@ -12,6 +12,18 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jdk.version>1.7</jdk.version>
+        
+    <!-- Dependencies Versions -->
+    
+    <junit.version>3.8.1</junit.version>
+    <spigot.version>1.11-R0.1-SNAPSHOT</spigot.version>
+    <bukkit.version>1.11-R0.1-SNAPSHOT</bukkit.version>
+    <psql.version>9.4.1212</psql.version>
+    <sql.version>6.1.0.jre7</sql.version>
+    <mysql.version>5.1.6</mysql.version>
+    
+    
   </properties>
 
   <repositories>
@@ -22,25 +34,131 @@
   </repositories>
 
   <dependencies>
+  
+        <!-- JUnit -->
+  
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
-        <!--Spigot API-->
+    
+        <!-- Spigot API -->
+        
     <dependency>
-           <groupId>org.spigotmc</groupId>
-           <artifactId>spigot-api</artifactId>
-           <version>1.11-R0.1-SNAPSHOT</version>
-           <scope>provided</scope>
+      <groupId>org.spigotmc</groupId>
+      <artifactId>spigot-api</artifactId>
+      <version>${spigot.version}</version>
+      <scope>provided</scope>
     </dependency>
-    <!--Bukkit API-->
+    
+        <!-- Bukkit API -->
+    
     <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>1.11-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
+      <groupId>org.bukkit</groupId>
+      <artifactId>bukkit</artifactId>
+      <version>${bukkit.version}</version>
+      <scope>provided</scope>
     </dependency>
+    
   </dependencies>
+  
+  <build>
+    
+        <!-- Plugins -->
+        
+    <plugins>
+    
+      <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-eclipse-plugin</artifactId>
+		<version>2.9</version>
+		<configuration>
+		  <downloadSources>true</downloadSources>
+		  <downloadJavadocs>false</downloadJavadocs>
+		</configuration>
+	  </plugin>
+	  
+	  			<!-- Set a compiler level -->
+	  <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-compiler-plugin</artifactId>
+		<version>2.3.2</version>
+		<configuration>
+		  <source>${jdk.version}</source>
+	      <target>${jdk.version}</target>
+		</configuration>
+	  </plugin>
+    
+      <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-shade-plugin</artifactId>
+		<version>2.3</version>
+		<executions>
+		<!-- Run shade goal on package phase -->
+		  <execution>
+			<phase>package</phase>
+			<goals>
+				<goal>shade</goal>
+			</goals>
+		    <configuration>
+			  <transformers>
+				<!-- add Main-Class to manifest file -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+					<mainClass>net.wynsolutions.bsc.BSCPlugin</mainClass>
+				</transformer>
+			  </transformers>
+			</configuration>
+		  </execution>
+		</executions>
+	  </plugin>
+    
+     <!-- <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.4.3</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <minimizeJar>true</minimizeJar>
+              <filters>
+                <filter>
+                   <artifact>org.postgresql:postgreql</artifact>
+                   <includes>
+                       <include>**</include>
+                   </includes>
+                </filter>
+                <filter>
+                   <artifact>com.microsoft.sqlserver:mssql-jdbc</artifact>
+                   <includes>
+                       <include>**</include>
+                   </includes>
+                </filter>
+                <filter>
+                   <artifact>mysql:msql-connector-java</artifact>
+                   <includes>
+                       <include>**</include>
+                   </includes>
+                </filter>
+                <filter>
+                   <artifact>junit:junit</artifact>
+                   <includes>
+                       <include>**</include>
+                   </includes>
+                </filter>
+              </filters> 
+            </configuration>
+          </execution>
+        </executions>
+      </plugin> -->
+    </plugins>
+    
+    
+  </build>
+  
 </project>

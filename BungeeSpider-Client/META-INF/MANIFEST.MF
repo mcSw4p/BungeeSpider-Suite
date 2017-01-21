@@ -1,0 +1,2 @@
+Manifest-Version: 1.0
+Class-Path: mssql-jdbc-6.1.0.jre7.jar lib/mssql-jdbc-6.1.0.jre7.jar mysql-connector-java-5.1.6.jar lib/mysql-connector-java-5.1.6.jar postgresql-9.4.1212.jar lib/postgresql-9.4.1212.jar

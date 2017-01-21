@@ -11,14 +11,41 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.wynsolutions.bsc.addons.AddonDownloader;
 import net.wynsolutions.bsc.addons.AddonHandler;
+import net.wynsolutions.bsc.api.BSC;
+import net.wynsolutions.bsc.api.debug.Debug;
 import net.wynsolutions.bsc.commands.AddonsCommand;
+import net.wynsolutions.bsc.commands.IDCommand;
 import net.wynsolutions.bsc.config.ShortcutConfig;
+import net.wynsolutions.bsc.database.DatabaseManager;
 import net.wynsolutions.bsc.listeners.ShortcutListener;
-
+/**
+ * Copyright (C) 2017  Sw4p
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * @author Sw4p
+ *
+ */
 public class BSCPluginLoader extends BSCPlugin{
+	
+	/*
+	 * When finished with objects, set them to null so garbage collector know to get rid of them and allow more space for new 
+	 * objects. This is not the most important thing in the world to do, from my testing it does just fine without it but 
+	 * researching this further i find people tend to be split on if you should or shouldn't and i see no harm in doing it.
+	 */
 
 	private int serverPort, serverTimeout;
 	private String serverIP, serverName;
@@ -27,6 +54,7 @@ public class BSCPluginLoader extends BSCPlugin{
 	public static BSCPluginLoader instance;
 	private AddonHandler addonHandler;
 	private ShortcutConfig shortcutConfig;
+	private DatabaseManager dbManager;
 	
 	@Override public void onEnable() { 
 
@@ -37,8 +65,10 @@ public class BSCPluginLoader extends BSCPlugin{
 		new BSC(this);
 		
 		this.addonHandler = new AddonHandler(this); 
+		
 		this.getServer().getPluginManager().registerEvents(new ShortcutListener(this), this);
 		BSC.getHandler().registerCommand("addon", new AddonsCommand());
+		BSC.getHandler().registerCommand("id", new IDCommand());
 		
 		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable(){
 
@@ -47,8 +77,6 @@ public class BSCPluginLoader extends BSCPlugin{
 			}
 
 		}, 0L, serverTimeout*20L);
-
-
 		super.onEnable();
 	}
 
@@ -64,6 +92,23 @@ public class BSCPluginLoader extends BSCPlugin{
 		this.getConfig().options().copyDefaults(true);
 		this.saveConfig();
 		
+		//Default Config variables
+		this.serverIP = this.getConfig().getString("server.ip");
+		this.serverPort = this.getConfig().getInt("server.port");
+		this.serverName = this.getConfig().getString("server.name");
+		this.serverTimeout = this.getConfig().getInt("server.timeout");
+		setDebug(this.getConfig().getBoolean("debug"));
+		
+		//Database Manager
+		if(this.getConfig().getBoolean("database.enabled")){
+			System.out.println("Starting connection to database with DatabaseManager. This could take a few seconds...");
+			this.dbManager = new DatabaseManager(this.getConfig());
+			Debug.info("Finished connection to database.");
+		}else{
+			Debug.info("Skipping database connection because it\'s disabled.");
+		}
+
+		
 		this.shortcutConfig = new ShortcutConfig(getDataFolder().getPath());
 		
 		File f = new File(getDataFolder().getPath() + File.separatorChar + "addons");
@@ -71,14 +116,9 @@ public class BSCPluginLoader extends BSCPlugin{
 			f.mkdirs();
 		}
 
-		this.serverIP = this.getConfig().getString("server.ip");
-		this.serverPort = this.getConfig().getInt("server.port");
-		this.serverName = this.getConfig().getString("server.name");
-		this.serverTimeout = this.getConfig().getInt("server.timeout");
-		setDebug(this.getConfig().getBoolean("debug"));
 	}
 
-	@Override public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+	@Override public boolean onCommand(final CommandSender sender, Command command, String label, final String[] args) {
 
 		if(label.equalsIgnoreCase("bsc")){
 
@@ -124,22 +164,60 @@ public class BSCPluginLoader extends BSCPlugin{
 						if(args.length == 2){
 							// Just url
 							if(args[1].startsWith("http://")){
-								AddonDownloader addl = new AddonDownloader(args[1]);
-								if(addl.startInstallation()){
-									sender.sendMessage(ChatColor.GREEN + "Finished installing addon.");
-								}else{
-									sender.sendMessage(ChatColor.RED + "There was an error while installing the addon. Maybe the URL is not direct?");
-								}	
+								new Thread(new Runnable(){
+
+									public void run() {
+										AddonDownloader addl = new AddonDownloader(args[1]);
+										if(addl.startInstallation()){
+											sender.sendMessage(ChatColor.GREEN + "Finished installing addon.");
+										}else{
+											sender.sendMessage(ChatColor.RED + "There was an error while installing the addon. Maybe the URL is not direct?");
+										}		
+									}	
+								}).start();
+								
 							}else{
-								sender.sendMessage(ChatColor.RED + "Correct usage - /bss downloadaddon [url] <name>.");
+								sender.sendMessage(ChatColor.RED + "Correct usage - /bss iadn [url].");
 							}
 						}else{
-							sender.sendMessage(ChatColor.RED + "Correct usage - /bss downloadaddon [url] <name>.");
+							sender.sendMessage(ChatColor.RED + "Correct usage - /bss iadn [url].");
 						}
 
 					}else{
 						sender.sendMessage(ChatColor.RED + "You are not allowed to do that!");
 					}	
+					
+				}else if(args[0].equalsIgnoreCase("file-install-addon") || args[0].equalsIgnoreCase("fiadn")){
+					
+					if(sender.hasPermission("bsc.cmd.installaddon")){
+						if(args.length == 2){
+							final File f = new File(this.getDataFolder().getPath() + File.separatorChar + args[1]);
+							
+							if(!f.getParentFile().exists()){
+								f.getParentFile().mkdir();
+							}
+							
+							if(!args[1].endsWith(".bsadi")){
+								sender.sendMessage(ChatColor.RED + "File \"" + f.getAbsolutePath() + "\" does not seem to be a install file.");
+								return false;
+							}
+							
+							if(f.exists()){
+								
+								new Thread(new Runnable(){
+
+									public void run() {
+										new AddonDownloader(f);
+										sender.sendMessage(ChatColor.GREEN + "Finished installing addons.");	
+									}	
+								}).start();
+								return true;
+							}else{
+								sender.sendMessage(ChatColor.RED + "File \"" + f.getAbsolutePath() + "\" does not exist!");
+								return false;
+							}
+						}
+					}
 					
 				}else{
 					sender.sendMessage(ChatColor.RED + "Unreconized command!");
@@ -156,6 +234,7 @@ public class BSCPluginLoader extends BSCPlugin{
 				sender.sendMessage(ChatColor.GOLD + "BungeeSpider-Client Commands:");
 				sender.sendMessage(ChatColor.GREEN + "- /bsc [update] = Update this server to the main server.");	
 				sender.sendMessage(ChatColor.GREEN + "- /bsc [shortcuts/sc] = List all shortcut names.");	
+				sender.sendMessage(ChatColor.GREEN + "- /bsc [install-addon/iadn] [url]= List all shortcut names.");	
 				return true;
 			}
 
@@ -236,6 +315,13 @@ public class BSCPluginLoader extends BSCPlugin{
 	 */
 	public ShortcutConfig getShortcutConfig() {
 		return shortcutConfig;
+	}
+
+	/**
+	 * @return the dbManager
+	 */
+	public DatabaseManager getDbManager() {
+		return dbManager;
 	}
 
 }

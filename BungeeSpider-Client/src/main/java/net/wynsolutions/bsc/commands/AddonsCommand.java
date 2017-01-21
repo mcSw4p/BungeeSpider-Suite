@@ -4,14 +4,37 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import net.md_5.bungee.api.ChatColor;
-import net.wynsolutions.bsc.BSC;
 import net.wynsolutions.bsc.addons.Addon;
-import net.wynsolutions.bsc.debug.Debug;
-
+import net.wynsolutions.bsc.addons.AddonDescription;
+import net.wynsolutions.bsc.api.BSC;
+import net.wynsolutions.bsc.api.debug.Debug;
+/**
+ * Copyright (C) 2017  Sw4p
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * @author Sw4p
+ *
+ */
 public class AddonsCommand extends Command{
 
 	public AddonsCommand() {
 		super("addon");
+		BSC.addShortCut(BSC.createShortCut("adr", "bsc.shortcut.ads", "addon reload"));
+		BSC.addShortCut(BSC.createShortCut("adrs", "bsc.shortcut.ads", "addon reload [arg0]"));
+		BSC.addShortCut(BSC.createShortCut("adl", "bsc.shortcut.ads", "addon list"));
+		
 	}
 
 	@Override public boolean execute(CommandSender sender, String label, String[] args) {
@@ -59,6 +82,23 @@ public class AddonsCommand extends Command{
 							return false;
 						}
 					}
+					
+				}else if(args[0].equalsIgnoreCase("list")){  
+					
+					if(sender.hasPermission("bsc.cmd.addons.list")){
+						String str = ChatColor.AQUA + "Addons(" + BSC.getHandler().getAddonDescriptions().size() + "): " + ChatColor.GREEN;
+						int i = 1;
+						for(String a : BSC.getHandler().getAddonDescriptions().keySet()){
+							if(i == BSC.getHandler().getAddonDescriptions().size()){
+								str += a + ChatColor.GRAY + ".";
+							}else{
+								str += a + ChatColor.GRAY + ", " + ChatColor.GREEN;
+							}
+							i++;
+						}
+						sender.sendMessage(str);
+					}
+
 					
 				}else{
 					sender.sendMessage(ChatColor.RED + "Unreconized command!");

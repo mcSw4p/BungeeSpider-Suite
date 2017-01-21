@@ -1,6 +1,6 @@
 name: BungeeSpider-Client
 main: net.wynsolutions.bsc.BSCPluginLoader
-version: 0.0.4
+version: 0.0.5
 commands:
   bsc:
     description: BungeeSpider-Client commands.

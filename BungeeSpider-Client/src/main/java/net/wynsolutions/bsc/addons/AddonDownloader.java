@@ -6,20 +6,48 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import com.google.common.base.Preconditions;
 
-import net.wynsolutions.bsc.BSC;
+import net.wynsolutions.bsc.api.BSC;
+import net.wynsolutions.bsc.api.debug.Debug;
 import net.wynsolutions.bsc.config.Configuration;
 import net.wynsolutions.bsc.config.ConfigurationProvider;
 import net.wynsolutions.bsc.config.YamlConfiguration;
-import net.wynsolutions.bsc.debug.Debug;
-
+/**
+ * Copyright (C) 2017  Sw4p
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * @author Sw4p
+ *
+ */
 public class AddonDownloader {
+
+	/*
+	 * Create a way to use a file to load a preset of addons.
+	 * For instance have a file with a list for direct urls and have the class load each url from that file and download the addon.
+	 * 
+	 * This will allow easy installation and fast deployment on server instances
+	 */
 
 	private URL pathToAddon;
 	private File addonPath, addonTempDir, addonTempFile;
@@ -30,8 +58,33 @@ public class AddonDownloader {
 
 	private final int BUFFER_SIZE = 4096;
 
+	public AddonDownloader(File listURL){
+
+		Debug.info("Starting new addon download from list in file \"" + listURL.getPath() + "\".");
+		
+		List<String> lines;
+		try {
+			lines = Files.readAllLines(listURL.toPath(), Charset.forName("UTF-8"));
+			for(String url : lines){
+				
+				if(url.startsWith("http://") && url.endsWith(".jar")){
+					
+					new AddonDownloader(url).startInstallation();
+					
+				}else{
+					Debug.info("Skipping line \"" + url + "\" from file because it does not seem to be a addon.");
+				}
+			
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+
+	}
+
 	public AddonDownloader(String fileURL) {
-		this.addonTempDir = new File(BSC.getDataFolder().getPath() + File.separatorChar + "addons" + File.separatorChar + "tmp");
+		this.addonTempDir = new File(BSC.getServerProperties().getDataFolder().getPath() + File.separatorChar + "addons" + File.separatorChar + "tmp");
 		try{
 			this.pathToAddon = new URL(fileURL);
 			Debug.info("Starting new URL connection to download addon. (" + fileURL + ")");
@@ -65,7 +118,7 @@ public class AddonDownloader {
 			e.printStackTrace();
 			System.out.println("Unable to download addon.");
 		}
-		
+
 		if(!this.addonTempFile.exists()){
 			try {
 				this.addonTempFile.createNewFile();
@@ -113,20 +166,20 @@ public class AddonDownloader {
 		else{
 			Preconditions.checkArgument(con.contains("client"), "Addon(" + aDesc.getName() + ") is not a client addon or does not have the client tag in spider.yml");
 		}
-		
+
 		return aDesc;
 	}
 
 	public boolean startInstallation(){
-		
+
 		Debug.info("Starting installation of addon.");
-		
+
 		if(failed){
 			this.addonTempFile.delete();
 			Debug.info("Download must have failed so i\'m deleting the temp file.");
 			return false;
 		}
-		
+
 		String msg = "Installing addon " + this.desc.getName() + " v" + this.desc.getVersion() + " by " + this.desc.getAuthor();
 		if(BSC.getHandler().addonExists(this.desc.getName())){
 
@@ -160,7 +213,7 @@ public class AddonDownloader {
 
 	private boolean loadAddon(boolean backup){
 
-		this.addonPath = new File(BSC.getDataFolder().getPath() + File.separatorChar + "addons" + File.separatorChar + this.desc.getName() + ".jar");
+		this.addonPath = new File(BSC.getServerProperties().getDataFolder().getPath() + File.separatorChar + "addons" + File.separatorChar + this.desc.getName() + ".jar");
 
 		if(backup){
 			File a = this.addon.getDescription().getFile();

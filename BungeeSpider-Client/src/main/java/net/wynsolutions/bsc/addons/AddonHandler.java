@@ -1,6 +1,7 @@
 package net.wynsolutions.bsc.addons;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
@@ -9,6 +10,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -22,11 +24,29 @@ import org.bukkit.event.Listener;
 import com.google.common.base.Preconditions;
 
 import net.wynsolutions.bsc.BSCPluginLoader;
+import net.wynsolutions.bsc.api.debug.Debug;
 import net.wynsolutions.bsc.config.Configuration;
 import net.wynsolutions.bsc.config.ConfigurationProvider;
 import net.wynsolutions.bsc.config.YamlConfiguration;
-import net.wynsolutions.bsc.debug.Debug;
-
+/**
+ * Copyright (C) 2017  Sw4p
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * @author Sw4p
+ *
+ */
 public class AddonHandler {
 
 	private BSCPluginLoader plugin;
@@ -44,40 +64,90 @@ public class AddonHandler {
 		this.scanForAddons(addonsDir);
 	}
 
+	/**
+	 * Reload a single addon in the BungeeSpider-Client addons folder
+	 * @param Addon instance
+	 */
 	public void reloadAddon(Addon par1){
-		Addon instance = this.getPluginMainClass(par1.getDescription());	
-		instance.onDisable();
+		
+		// Disable active addon
 		System.out.println("[BSC] Disabled addon \"" + par1.getDescription().getName() + "\".");
-		instance.init(this, par1.getDescription());
-		instance.onLoad();
-		System.out.println("[BSC] Starting addon \"" + par1.getDescription().getName() + "\".");
-		instance.onEnable();
-		System.out.println("[BSC] Enabled addon \"" + par1.getDescription().getName() + "\" v" + par1.getDescription().getVersion() + " by " + par1.getDescription().getAuthor() + ".");
-		if(par1.getDescription().getDescription() != null && !par1.getDescription().getDescription().equals("")){
-			System.out.println("[BSC] " + par1.getDescription().getName() + ": " + par1.getDescription().getDescription());
+		par1.onDisable();
+		addons.remove(par1);
+		addonDescriptions.remove(par1.getDescription().getName());
+		try {
+			addonClassLoaders.get(par1.getDescription().getName()).close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		addonClassLoaders.remove(par1.getDescription().getName());
+		
+		// Load new jar 
+		AddonDescription desc = null;
+		File file = new File(par1.getDescription().getFile().getAbsolutePath());
+		try (JarFile jar = new JarFile(file)) {
+			JarEntry pdf = jar.getJarEntry("spider.yml");
+			Preconditions.checkNotNull(pdf, "Addon must have a spider.yml");
+
+			try (InputStream in = jar.getInputStream(pdf)){
+				Configuration con = ConfigurationProvider.getProvider(YamlConfiguration.class).load(in);
+				desc = new AddonDescription();
+				this.loadAddonDescriptionFile(con, desc);
+				desc.setFile(file);
+				Debug.info("[BSC] Found a valid addon with name \"" + desc.getName() + "\" v" + desc.getVersion() + " by " + desc.getAuthor() + ".");
+				this.addonDescriptions.put(desc.getName(), desc);
+			}
+		} catch (Exception ex){
+			System.out.println("Could not load addon from file " + file);
+			desc = par1.getDescription();
+		}
+		
+		// Activate new instance addon
+		
+		Addon newInstance = this.getPluginMainClass(desc);	
+		newInstance.init(this, desc);
+		newInstance.onLoad();
+		System.out.println("[BSC] Starting addon \"" +desc.getName() + "\".");
+		newInstance.onEnable();
+		System.out.println("[BSC] Enabled addon \"" + desc.getName() + "\" v" + desc.getVersion() + " by " + desc.getAuthor() + ".");
+		if(desc.getDescription() != null && !desc.getDescription().equals("")){
+			System.out.println("[BSC] " + desc.getName() + ": " + desc.getDescription());
 		}
 	}
 
+	/**
+	 * Reload all addons in the BungeeSpider-Client addons folder
+	 */
 	public void reloadAddons(){
 		this.disableAddons();
-		this.loadAddons();
+		this.scanForAddons(this.addonsDir);
 	}
 
+	/**
+	 * Disable all addons in the BungeeSpider-Client addons folder
+	 */
 	public void disableAddons(){
-		Debug.info("[+]Disabling addons[+]");
+		System.out.println("[+]Disabling addons[+]");
 		for(AddonDescription description : addonDescriptions.values()){
 			Addon instance = this.getPluginMainClass(description);	
 			instance.onDisable();
 			System.out.println("[BSC] Disabled addon \"" + description.getName() + "\".");
-			addons.remove(instance);
-			addonDescriptions.remove(instance.getDescription().getName());
-			addonClassLoaders.get(description.getName()).clearAssertionStatus();
+			try {
+				addonClassLoaders.get(description.getName()).close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			addonClassLoaders.remove(description.getName());
 		}	
+		addonDescriptions = new HashMap<String, AddonDescription>();
+		addons = new ArrayList<Addon>();
 	}
 
+	/**
+	 * Load all addons in the BungeeSpider-Client addons folder
+	 */
 	private void loadAddons(){
-		Debug.info("[+]Starting addons[+]");
+		System.out.println("[+]Starting addons[+]");
 		for(AddonDescription description : addonDescriptions.values()){
 			Addon instance = this.getPluginMainClass(description);
 			instance.init(this, description);
@@ -92,6 +162,10 @@ public class AddonHandler {
 		}	
 	}
 
+	/**
+	 * Scan for addons in the BungeeSpider-Client addons folder and load their Description file
+	 * @param dir
+	 */
 	private void scanForAddons(File dir){
 
 		/**
@@ -99,6 +173,7 @@ public class AddonHandler {
 		 * @modified by Sw4p
 		 */
 
+		Debug.info("Scanning for addons...");
 		Preconditions.checkNotNull(dir, "Addons Directory is null");
 		Preconditions.checkArgument(dir.isDirectory(), "Addons folder path is not a directory!");
 
@@ -125,6 +200,11 @@ public class AddonHandler {
 		this.loadAddons();
 	}
 
+	/**
+	 * Gets an Addon instance from a Description file.
+	 * @param desc
+	 * @return The Addon instance for a Description file
+	 */
 	private Addon getPluginMainClass(AddonDescription desc){
 		URLClassLoader child;
 		try {
@@ -152,6 +232,12 @@ public class AddonHandler {
 		return null;
 	}
 
+	/**
+	 * Load a Description file with all variables
+	 * @param con
+	 * @param aDesc
+	 * @return The Description file with all variables loaded
+	 */
 	private AddonDescription loadAddonDescriptionFile(Configuration con, AddonDescription aDesc){
 
 		Preconditions.checkArgument(con.contains("name"), "Could not load addon\'s name.");
@@ -171,7 +257,12 @@ public class AddonHandler {
 
 		return aDesc;
 	}
-
+	
+	/**
+	 * Get an addon by name
+	 * @param name
+	 * @return The Addon instance
+	 */
 	public Addon getAddon(String name){
 		for(Addon a : this.addons){
 			if(a.getDescription().getName().equalsIgnoreCase(name)){
@@ -181,6 +272,11 @@ public class AddonHandler {
 		return null;
 	}
 
+	/**
+	 * Register a command with Bukkit
+	 * @param name
+	 * @param executor
+	 */
 	public void registerCommand(String name, final Command executor){
 		Field bukkitCommandMap;
 		try {
@@ -197,13 +293,25 @@ public class AddonHandler {
 		}
 	}
 	
+	/**
+	 * Disable a single addon in the BungeeSpider-Client addons folder
+	 * @param a
+	 */
 	public void disableAddon(Addon a){
 		a.onDisable();
 		addons.remove(a);
-		addonClassLoaders.get(a.getDescription().getName()).clearAssertionStatus();
+		try {
+			addonClassLoaders.get(a.getDescription().getName()).close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		addonClassLoaders.remove(a.getDescription().getName());
 	}
 	
+	/**
+	 * Enable a single addon in the BungeeSider-Client addons folder
+	 * @param desc
+	 */
 	public void enableAddon(AddonDescription desc){
 		Addon add = this.getPluginMainClass(desc);
 		add.init(this, desc);
@@ -212,6 +320,11 @@ public class AddonHandler {
 		addons.add(add);
 	}
 	
+	/**
+	 * Check is a addon exists with a name
+	 * @param name
+	 * @return true/false
+	 */
 	public boolean addonExists(String name){
 		
 		for(Addon a : this.addons){
@@ -223,24 +336,67 @@ public class AddonHandler {
 		return false;
 	}
 	
+	/**
+	 * Register a listener with Bukkit
+	 * @param list
+	 */
 	public void registerListener(Listener list){
 		this.plugin.getMCServer().getPluginManager().registerEvents(list, this.plugin);
 	}
 	
+	/**
+	 * Unregister a listener from Bukkit
+	 * @param list
+	 */
 	public void unregisterListener(Listener list){
 		HandlerList.unregisterAll(list);
 	}
 
+	/**
+	 * @param name
+	 * @return The player with the name @param
+	 */
 	public Player getPlayerByName(String name){
 		return Bukkit.getPlayer(name);
 	}
+	
+	/**
+	 * @param id
+	 * @return The player with the UUID @param
+	 */
+	public Player getPlayerByUUID(UUID id){
+		return Bukkit.getPlayer(id);
+	}
 
+	/**
+	 * @return The Server ip address
+	 */
 	public String getServerIp(){
 		return plugin.getServerIP();
 	}
 
+	/**
+	 * @return The Server port number
+	 */
 	public int getServerPort(){
 		return plugin.getServerPort();
+	}
+	
+	/**
+	 * Install a addon from a direct URL to the BungeeSpider-Client addons folder
+	 * @param url
+	 */
+	public void installAddon(final String url){
+		new Thread(new Runnable(){
+			public void run() {
+				AddonDownloader addl = new AddonDownloader(url);
+				if(addl.startInstallation()){
+					System.out.println("Finished installing addon.");
+				}else{
+					System.out.println("There was an error while installing the addon. Maybe the URL is not direct?");
+				}		
+			}	
+		}).start();
 	}
 
 	/**

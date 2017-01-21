@@ -3,4 +3,28 @@ server:
   port: 25566
   name: MyServer
   timeout: 30
+  
+database:
+  enabled: false
+  postgresql:
+    enable: false
+    ip: 0.0.0.0
+    port: 5432
+    user: postgres
+    pass: postgres
+    database: bngspdclient
+  sql:
+    enable: false
+    ip: 0.0.0.0
+    port: 5432
+    user: sql
+    pass: sql
+    database: bngspdclient
+  mysql:
+    enable: false
+    ip: 0.0.0.0
+    port: 5432
+    user: mysql
+    pass: mysql
+    database: bngspdclient
 debug: true
