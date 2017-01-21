@@ -1,0 +1,26 @@
+.button {
+    -fx-text-fill: white;
+    -fx-font-family: "Arial Narrow";
+    -fx-font-weight: bold;
+    -fx-background-color: linear-gradient(#37b2cd, #48747d);
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+
+.button:hover {
+    -fx-background-color: linear-gradient(#48747d, #37b2cd);
+}
+
+.root {
+     -fx-background-image: url("http://i.imgur.com/nuLnke6.png");
+}
+
+#tag {
+	-fx-fill: #ffffff;
+}
+
+#title {
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-fill: #ffffff;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,1) , 0,0,0,1 );
+}
